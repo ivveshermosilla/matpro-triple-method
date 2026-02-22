@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tablas Pro 👑 - Ranking Detallado</title>
+    <style>
+        :root { --azul: #2980b9; --naranja: #e67e22; --rojo: #e74c3c; --verde: #27ae60; --gris: #7f8c8d; --fondo: #2c3e50; --purpura: #8e44ad; --dorado: #f1c40f; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--fondo); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: white; overflow: hidden; }
+        
+        #quiz-container { background-color: #ecf0f1; padding: 25px; border-radius: 25px; width: 95%; max-width: 500px; max-height: 95vh; text-align: center; color: #2c3e50; box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; overflow-y: auto; display: flex; flex-direction: column; }
+        .hidden { display: none !important; }
+        
+        /* Botones Principales */
+        .mode-btn { display: block; width: 100%; padding: 20px; margin: 10px 0; border: none; border-radius: 20px; font-size: 22px; font-weight: 900; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 0 rgba(0,0,0,0.2); }
+        .mode-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .btn-pro { background: var(--azul); color: white; }
+        .btn-maxi { background: #2d3436; border: 3px solid var(--dorado); color: var(--dorado); }
+
+        /* Configuración */
+        .config-section { text-align: left; background: white; padding: 15px; border-radius: 15px; margin-bottom: 12px; border: 1px solid #ddd; }
+        .config-label { font-weight: bold; font-size: 13px; color: var(--azul); display: block; margin-bottom: 5px; }
+        .slider-container { display: flex; align-items: center; gap: 10px; }
+        .val-badge { background: var(--azul); color: white; padding: 5px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; min-width: 35px; text-align: center; }
+
+        /* Cuadrícula de Tablas */
+        .tables-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-top: 8px; }
+        .table-chip { background: #eee; border: 2px solid #ddd; padding: 6px 0; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 13px; text-align: center; }
+        .table-chip.active { background: var(--verde); color: white; border-color: #1e8449; }
+
+        /* Ranking Table Mejorada */
+        .ranking-container { margin-top: 20px; background: white; border-radius: 15px; overflow: hidden; border: 1px solid #ddd; }
+        .records-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .records-table th { background: #34495e; color: white; padding: 10px; font-size: 10px; }
+        .records-table td { padding: 10px; border-bottom: 1px solid #eee; color: #333; text-align: center; }
+        .diff-tag { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; color: white; text-transform: uppercase; }
+        .tablas-list { font-size: 9px; color: var(--gris); display: block; margin-top: 2px; }
+
+        .btn-main { padding: 16px; font-size: 18px; background-color: var(--verde); color: white; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .btn-back { background: var(--gris); margin-top: 10px; font-size: 14px; padding: 10px; }
+        
+        /* Scroll Interno */
+        .scroll-subwindow { background: #f8f9fa; border: 2px solid #bdc3c7; border-radius: 15px; max-height: 180px; overflow-y: auto; margin-top: 10px; padding: 10px; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="mode-screen">
+        <h1 style="margin:0 0 10px 0;">¡Hola Campeón! 🏆</h1>
+        <button class="mode-btn btn-pro" onclick="showConfig()">Tablas Pro 👑</button>
+        <button class="mode-btn btn-maxi" onclick="startMaxi()">Maxitablas Pro ⭐</button>
+        
+        <div class="ranking-container">
+            <div style="background:#f1f2f6; padding:8px; font-weight:bold; font-size:12px; color:#2c3e50;">TOP Récords Mundiales</div>
+            <table class="records-table" id="global-ranking"></table>
+        </div>
+    </div>
+
+    <div id="config-screen" class="hidden">
+        <h2 style="margin: 0 0 15px 0; color: var(--azul);">Configuración 👑</h2>
+        
+        <div style="display:flex; gap:5px; margin-bottom:10px;">
+            <button class="mode-btn" style="flex:1; padding:10px; font-size:12px; background:var(--verde); color:white;" onclick="applyPreset('facil')">FÁCIL</button>
+            <button class="mode-btn" style="flex:1; padding:10px; font-size:12px; background:var(--azul); color:white;" onclick="applyPreset('medio')">MEDIO</button>
+            <button class="mode-btn" style="flex:1; padding:10px; font-size:12px; background:var(--purpura); color:white;" onclick="applyPreset('experto')">EXPERTO</button>
+        </div>
+
+        <div class="config-section">
+            <label class="config-label">Preguntas: <span id="val-q" class="val-badge" onclick="manualInput('q')">20</span></label>
+            <input type="range" id="range-q" min="1" max="100" value="20" style="width:100%" oninput="updateVal('q', this.value)">
+        </div>
+
+        <div class="config-section">
+            <label class="config-label">Tiempo (seg): <span id="val-t" class="val-badge" onclick="manualInput('t')">15</span></label>
+            <input type="range" id="range-t" min="1" max="30" value="15" style="width:100%" oninput="updateVal('t', this.value)">
+        </div>
+
+        <div class="config-section">
+            <label class="config-label">Tablas a incluir:</label>
+            <div class="tables-grid" id="tables-grid"></div>
+        </div>
+
+        <div id="extra-penalty" onclick="toggleExtra()" style="cursor:pointer; background:white; padding:10px; border-radius:10px; border:1px solid #ddd; margin-bottom:10px; font-size:12px; display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="check-penalty" style="pointer-events:none">
+            <span>Penalización: -1 buena por cada 2 malas</span>
+        </div>
+
+        <button class="btn-main" onclick="initGame()">¡EMPEZAR JUEGO!</button>
+        <button class="btn-main btn-back" onclick="location.reload()">ATRÁS</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div id="progress" style="font-weight:bold; color:var(--gris); font-size:13px;">Pregunta <span id="current-num">1</span> / <span id="total-num">20</span></div>
+        <div style="width:100%; height:10px; background:#ddd; border-radius:5px; margin:10px 0; overflow:hidden;">
+            <div id="timer-bar" style="width:100%; height:100%; background:var(--rojo);"></div>
+        </div>
+        <div id="question" style="font-size:70px; font-weight:900; color:var(--azul); margin:15px 0;">? × ?</div>
+        <div id="options">
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2>Tu Nota</h2>
+        <div id="grade" style="font-size:70px; font-weight:900; margin:10px 0;">1.0</div>
+        
+        <div style="background:#dfe6e9; padding:15px; border-radius:15px; margin-bottom:15px; color:#2c3e50;">
+            <div style="display: flex; justify-content: space-around; font-weight: bold;">
+                <span style="color:var(--verde)">✅ <span id="res-correct">0</span></span>
+                <span style="color:var(--rojo)">❌ <span id="res-wrong">0</span></span>
+                <span style="color:var(--gris)">⚪ <span id="res-skipped">0</span></span>
+            </div>
+        </div>
+
+        <input type="text" id="player-name-input" placeholder="Escribe tu nombre..." maxlength="15" style="width:80%; padding:15px; border-radius:10px; border:2px solid #ddd; text-align:center; font-size:18px; margin-bottom:10px;">
+        <button class="btn-main" onclick="saveResult()">GUARDAR RECORD</button>
+        <button class="btn-main btn-back" onclick="location.reload()">SALIR</button>
+    </div>
+</div>
+
+<script>
+    const DB_KEY = 'tablas_pro_v18_records';
+    let config = { q: 20, t: 15, tables: [1,2,3,4,5,6,7,8,9,10,11,12], penalty: false };
+    let pool = [], currentIdx = 0, score = { c:0, w:0, s:0 }, history = [], timer;
+    let isMaxi = false;
+
+    // Iniciar rejilla de tablas
+    const grid = document.getElementById('tables-grid');
+    for(let i=1; i<=12; i++) {
+        const d = document.createElement('div');
+        d.className = 'table-chip active';
+        d.innerText = i;
+        d.onclick = () => {
+            if(config.tables.includes(i)) {
+                if(config.tables.length > 1) { config.tables = config.tables.filter(x => x !== i); d.classList.remove('active'); }
+            } else { config.tables.push(i); d.classList.add('active'); }
+        };
+        grid.appendChild(d);
+    }
+
+    function updateVal(type, val) {
+        config[type] = parseInt(val);
+        document.getElementById(`val-${type}`).innerText = val;
+        document.getElementById(`range-${type}`).value = val;
+    }
+
+    function applyPreset(p) {
+        if(p === 'facil') { updateVal('q', 20); updateVal('t', 15); config.penalty = false; }
+        else if(p === 'medio') { updateVal('q', 20); updateVal('t', 10); config.penalty = false; }
+        else if(p === 'experto') { updateVal('q', 20); updateVal('t', 7); config.penalty = true; }
+        document.getElementById('check-penalty').checked = config.penalty;
+        document.getElementById('extra-penalty').style.borderColor = config.penalty ? 'var(--rojo)' : '#ddd';
+    }
+
+    function toggleExtra() { 
+        config.penalty = !config.penalty; 
+        document.getElementById('check-penalty').checked = config.penalty; 
+        document.getElementById('extra-penalty').style.borderColor = config.penalty ? 'var(--rojo)' : '#ddd';
+    }
+
+    function showConfig() {
+        isMaxi = false;
+        document.getElementById('mode-screen').classList.add('hidden');
+        document.getElementById('config-screen').classList.remove('hidden');
+    }
+
+    function startMaxi() {
+        isMaxi = true;
+        config = { q: 144, t: 10, tables: [1,2,3,4,5,6,7,8,9,10,11,12], penalty: false };
+        initGame();
+    }
+
+    function initGame() {
+        pool = [];
+        if(isMaxi) {
+            for(let i=1; i<=12; i++) for(let j=1; j<=12; j++) pool.push({a: i, b: j});
+        } else {
+            for(let i=0; i<config.q; i++) {
+                let a = config.tables[Math.floor(Math.random()*config.tables.length)];
+                let b = Math.floor(Math.random()*12)+1;
+                pool.push({a, b});
+            }
+        }
+        pool = pool.sort(() => Math.random() - 0.5);
+        currentIdx = 0; score = { c:0, w:0, s:0 };
+        document.getElementById('total-num').innerText = pool.length;
+        document.getElementById('config-screen').classList.add('hidden');
+        document.getElementById('mode-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        showQ();
+    }
+
+    function showQ() {
+        if(currentIdx >= pool.length) return finish();
+        document.getElementById('current-num').innerText = currentIdx + 1;
+        const q = pool[currentIdx];
+        const ans = q.a * q.b;
+        document.getElementById('question').innerText = `${q.a} × ${q.b}`;
+        let opts = new Set([ans, ans+1, ans-1, q.a*(q.b+1)]);
+        while(opts.size < 4) opts.add(Math.floor(Math.random()*144)+1);
+        const finalOpts = Array.from(opts).sort(() => Math.random() - 0.5);
+        document.getElementById('options').innerHTML = finalOpts.map(o => `<button class="option-btn" onclick="handleSelect(${o})">${o}</button>`).join('');
+        resetTimer();
+    }
+
+    function resetTimer() {
+        const bar = document.getElementById('timer-bar');
+        bar.style.transition = 'none'; bar.style.width = '100%';
+        setTimeout(() => { bar.style.transition = `width ${config.t}s linear`; bar.style.width = '0%'; }, 50);
+        clearInterval(timer);
+        let left = config.t;
+        timer = setInterval(() => { left--; if(left <= 0) { clearInterval(timer); handleSelect(null); } }, 1000);
+    }
+
+    function handleSelect(val) {
+        clearInterval(timer);
+        const q = pool[currentIdx];
+        if(val === q.a * q.b) score.c++; else if(val === null) score.s++; else score.w++;
+        currentIdx++; showQ();
+    }
+
+    function finish() {
+        let eff = score.c;
+        if(config.penalty) eff = Math.max(0, score.c - Math.floor((score.w + score.s)/2));
+        let g = ((eff / pool.length) * 6 + 1).toFixed(1);
+        document.getElementById('grade').innerText = g;
+        document.getElementById('grade').style.color = g >= 4.0 ? 'var(--verde)' : 'var(--rojo)';
+        document.getElementById('res-correct').innerText = score.c;
+        document.getElementById('res-wrong').innerText = score.w;
+        document.getElementById('res-skipped').innerText = score.s;
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+    }
+
+    function getDiffLabel() {
+        if(isMaxi) return { text: "MAXI", color: "#2d3436" };
+        if(config.q === 20 && config.t === 15 && !config.penalty) return { text: "FÁCIL", color: "var(--verde)" };
+        if(config.q === 20 && config.t === 10 && !config.penalty) return { text: "MEDIO", color: "var(--azul)" };
+        if(config.q === 20 && config.t === 7 && config.penalty) return { text: "EXPERTO", color: "var(--purpura)" };
+        return { text: "CUSTOM", color: "var(--naranja)" };
+    }
+
+    function saveResult() {
+        const name = document.getElementById('player-name-input').value.trim() || "Anónimo";
+        const diff = getDiffLabel();
+        const record = {
+            name,
+            grade: document.getElementById('grade').innerText,
+            diff: diff.text,
+            color: diff.color,
+            tables: config.tables.sort((a,b)=>a-b).join(','),
+            q: config.q
+        };
+        let recs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+        recs.push(record);
+        recs.sort((a,b) => b.grade - a.grade).splice(10);
+        localStorage.setItem(DB_KEY, JSON.stringify(recs));
+        location.reload();
+    }
+
+    function renderRanking() {
+        const recs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+        const table = document.getElementById('global-ranking');
+        let html = `<tr><th>Jugador</th><th>Nota</th><th>Nivel</th></tr>`;
+        recs.forEach(r => {
+            html += `<tr>
+                <td><b>${r.name}</b><br><span class="tablas-list">Tablas: ${r.tables}</span></td>
+                <td style="font-size:14px; font-weight:bold; color:var(--azul)">${r.grade}</td>
+                <td><span class="diff-tag" style="background:${r.color}">${r.diff}</span><br><small>${r.q} Qs</small></td>
+            </tr>`;
+        });
+        table.innerHTML = html || '<tr><td colspan="3">¡Sé el primero en jugar!</td></tr>';
+    }
+
+    renderRanking();
+</script>
+</body>
+</html>

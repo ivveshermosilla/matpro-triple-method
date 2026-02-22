@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablas Nivel Pro - Desafío Chile</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+        }
+        #quiz-container {
+            background-color: #ecf0f1;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            width: 90%;
+            max-width: 420px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .hidden { display: none; }
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #e67e22;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            transition: transform 0.1s, background 0.2s;
+        }
+        .option-btn:active { transform: scale(0.95); }
+        #timer-bar-container {
+            width: 100%;
+            height: 12px;
+            background-color: #bdc3c7;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        #timer-bar {
+            width: 100%;
+            height: 100%;
+            background-color: #e74c3c;
+            transition: width 10s linear;
+        }
+        #question { font-size: 56px; margin: 20px 0; color: #2980b9; font-weight: 800; }
+        #start-btn, #retry-btn {
+            padding: 20px 40px;
+            font-size: 22px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .grade-box { font-size: 60px; font-weight: 900; margin: 10px 0; color: #2c3e50; }
+        .achievement-icon { font-size: 80px; margin: 10px 0; }
+        .stats { font-size: 18px; line-height: 1.6; background: #dfe6e9; padding: 15px; border-radius: 10px; }
+        #progress { font-weight: bold; color: #7f8c8d; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="start-screen">
+        <h1>Desafío 20 Preguntas</h1>
+        <p>Tablas: 2, 3, 4, 5 y 10 (máx 5)</p>
+        <p>⚡ 10 segundos por respuesta</p>
+        <button id="start-btn">EMPEZAR</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div id="progress">Pregunta <span id="current-num">1</span> de 20</div>
+        <div id="timer-bar-container"><div id="timer-bar"></div></div>
+        <div id="question">? × ?</div>
+        <div id="options">
+            <button class="option-btn" onclick="checkAnswer(this)"></button>
+            <button class="option-btn" onclick="checkAnswer(this)"></button>
+            <button class="option-btn" onclick="checkAnswer(this)"></button>
+            <button class="option-btn" onclick="checkAnswer(this)"></button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h1>Tu Nota</h1>
+        <div id="achievement" class="achievement-icon"></div>
+        <div id="grade" class="grade-box">1.0</div>
+        <div class="stats">
+            <p>✅ Correctas: <span id="res-correct">0</span> / 20</p>
+            <p>❌ Incorrectas: <span id="res-wrong">0</span></p>
+            <p>⚪ Omitidas: <span id="res-skipped">0</span></p>
+        </div>
+        <br>
+        <button id="retry-btn" onclick="location.reload()">REINTENTAR</button>
+    </div>
+</div>
+
+<script>
+    const totalQuestions = 20;
+    const tables = [2, 3, 4, 5];
+    let questions = [];
+    let currentIdx = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let skippedCount = 0;
+    let timerInterval;
+
+    document.getElementById('start-btn').addEventListener('click', startGame);
+
+    function startGame() {
+        generateQuestions();
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function generateQuestions() {
+        let count10 = 0;
+        for (let i = 0; i < totalQuestions; i++) {
+            let t;
+            // Solo permitir tabla del 10 hasta 5 veces
+            if (count10 < 5 && (Math.random() > 0.7 || (totalQuestions - i) <= (5 - count10))) {
+                t = 10;
+                count10++;
+            } else {
+                t = tables[Math.floor(Math.random() * tables.length)];
+            }
+            const n = Math.floor(Math.random() * 11) + 2; 
+            questions.push({ a: t, b: n, ans: t * n });
+        }
+        questions.sort(() => Math.random() - 0.5);
+    }
+
+    function generateDistractors(correct) {
+        let distractors = new Set();
+        // Espejo
+        let sAns = correct.toString();
+        if (sAns.length > 1) {
+            let rev = parseInt(sAns.split('').reverse().join(''));
+            if (rev !== correct) distractors.add(rev);
+        }
+        // Vecinos
+        distractors.add(correct + 1);
+        distractors.add(correct - 1);
+        // Error de tabla
+        distractors.add(correct + 5);
+        distractors.add(Math.abs(correct - 10));
+
+        while (distractors.size < 3) {
+            distractors.add(correct + Math.floor(Math.random() * 10) + 2);
+        }
+
+        let finalOptions = Array.from(distractors).slice(0, 3);
+        finalOptions.push(correct);
+        return finalOptions.sort(() => Math.random() - 0.5);
+    }
+
+    function showQuestion() {
+        if (currentIdx >= totalQuestions) return endGame();
+        
+        document.getElementById('current-num').innerText = currentIdx + 1;
+        const q = questions[currentIdx];
+        document.getElementById('question').innerText = `${q.a} × ${q.b}`;
+        
+        const choices = generateDistractors(q.ans);
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach((btn, i) => {
+            btn.innerText = choices[i];
+        });
+
+        startTimer();
+    }
+
+    function startTimer() {
+        const bar = document.getElementById('timer-bar');
+        bar.style.transition = 'none';
+        bar.style.width = '100%';
+        
+        setTimeout(() => {
+            bar.style.transition = 'width 10s linear';
+            bar.style.width = '0%';
+        }, 50);
+
+        clearInterval(timerInterval);
+        let timeLeft = 10;
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                skippedCount++;
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(btn) {
+        clearInterval(timerInterval);
+        const selected = parseInt(btn.innerText);
+        if (selected === questions[currentIdx].ans) {
+            correctCount++;
+        } else {
+            wrongCount++;
+        }
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < totalQuestions) {
+            showQuestion();
+        } else {
+            endGame();
+        }
+    }
+
+    function calculateGrade(points) {
+        const maxPoints = totalQuestions;
+        const cutoff = 0.6; // 60% exigencia para el 4.0
+        let grade;
+
+        if (points < maxPoints * cutoff) {
+            // Nota de 1.0 a 4.0
+            grade = 1.0 + (3.0 * (points / (maxPoints * cutoff)));
+        } else {
+            // Nota de 4.0 a 7.0
+            grade = 4.0 + (3.0 * ((points - (maxPoints * cutoff)) / (maxPoints * (1 - cutoff))));
+        }
+        return grade.toFixed(1);
+    }
+
+    function endGame() {
+        clearInterval(timerInterval);
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+
+        const finalGrade = calculateGrade(correctCount);
+        const gradeEl = document.getElementById('grade');
+        gradeEl.innerText = finalGrade;
+
+        // Colores y Logros
+        const ach = document.getElementById('achievement');
+        if (parseFloat(finalGrade) >= 4.0) {
+            gradeEl.style.color = "#2980b9"; // Azul si aprueba
+            ach.innerText = parseFloat(finalGrade) === 7.0 ? "🏆" : "⭐";
+        } else {
+            gradeEl.style.color = "#e74c3c"; // Rojo si reprueba
+            ach.innerText = "📚";
+        }
+
+        document.getElementById('res-correct').innerText = correctCount;
+        document.getElementById('res-wrong').innerText = wrongCount;
+        document.getElementById('res-skipped').innerText = skippedCount;
+    }
+</script>
+</body>
+</html>

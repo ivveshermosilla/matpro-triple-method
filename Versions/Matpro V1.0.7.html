@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tablas Pro - Final</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: white;
+        }
+        #quiz-container {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            width: 95%;
+            max-width: 480px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .hidden { display: none !important; }
+        .option-btn {
+            display: block; width: 100%; padding: 15px; margin: 10px 0;
+            font-size: 22px; font-weight: bold; cursor: pointer;
+            background-color: #e67e22; color: white; border: none;
+            border-radius: 12px; -webkit-tap-highlight-color: transparent;
+        }
+        #timer-bar-container {
+            width: 100%; height: 14px; background-color: #bdc3c7;
+            border-radius: 7px; margin-bottom: 20px; overflow: hidden;
+        }
+        #timer-bar { width: 100%; height: 100%; background-color: #e74c3c; }
+        #question { font-size: 60px; margin: 15px 0; color: #2980b9; font-weight: 900; }
+        .grade-box { font-size: 65px; font-weight: 900; margin: 5px 0; }
+        .stats { font-size: 16px; background: #dfe6e9; padding: 15px; border-radius: 15px; margin-bottom: 10px; }
+        
+        /* Tabla de Récords */
+        .records-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; background: white; border-radius: 10px; overflow: hidden; color: #333; }
+        .records-table th { background: #34495e; color: white; padding: 10px; }
+        .records-table tr { cursor: pointer; border-bottom: 1px solid #eee; }
+        .records-table tr:last-child { border-bottom: none; }
+        .records-table td { padding: 10px; }
+        .current-record { background-color: #f1c40f !important; font-weight: bold; }
+
+        /* Panel de Revisión */
+        #review-panel {
+            text-align: left; background: white; padding: 15px; border-radius: 15px;
+            max-height: 250px; overflow-y: auto; margin-top: 15px; border: 2px solid #bdc3c7; color: #333;
+        }
+        .review-item { padding: 8px; border-bottom: 1px solid #eee; font-size: 14px; line-height: 1.4; }
+        .rev-correct { border-left: 5px solid #27ae60; background: #f0fff4; }
+        .rev-wrong { border-left: 5px solid #e74c3c; background: #fff5f5; }
+        .rev-skipped { border-left: 5px solid #95a5a6; background: #f8f9fa; }
+
+        .btn-main {
+            padding: 18px 35px; font-size: 20px; background-color: #27ae60;
+            color: white; border: none; border-radius: 15px; cursor: pointer; font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="start-screen">
+        <h1>Tablas Pro 🏆</h1>
+        <p>20 Preguntas | Escala Chile 60%</p>
+        <button class="btn-main" onclick="startGame()">EMPEZAR JUEGO</button>
+        <div style="margin-top:25px;">
+            <h3>TOP 10 HISTÓRICO</h3>
+            <p style="font-size:11px; margin-top:-10px;">(Toca un récord para ver sus errores)</p>
+            <table class="records-table" id="records-list-start"></table>
+            <button onclick="clearAllData()" style="margin-top:15px; font-size:10px; opacity:0.5; background:none; border:none; color:gray; cursor:pointer;">Borrar todos los récords</button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div id="progress" style="font-weight:bold; color:#7f8c8d;">Pregunta <span id="current-num">1</span> / 20</div>
+        <div id="timer-bar-container"><div id="timer-bar"></div></div>
+        <div id="question">? × ?</div>
+        <div id="options">
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2 id="result-title">Resultados</h2>
+        <div id="achievement" style="font-size:60px; margin: 10px 0;"></div>
+        <div id="grade" class="grade-box">1.0</div>
+        <div class="stats">
+            <p style="color:#8e44ad; font-weight:bold; margin:5px 0;">⏱️ Tiempo Total: <span id="res-time">0</span>s</p>
+            <p style="margin:5px 0;">✅ <span id="res-correct">0</span> | ❌ <span id="res-wrong">0</span> | ⚪ <span id="res-skipped">0</span></p>
+        </div>
+
+        <button class="btn-main" style="background:#2980b9; padding: 10px 20px; font-size: 16px;" onclick="toggleReview()">VER ERRORES DE ESTA PARTIDA</button>
+        <div id="review-panel" class="hidden"></div>
+        
+        <div style="margin-top:20px;">
+            <h3>RÉCORDS</h3>
+            <table class="records-table" id="records-list-end"></table>
+        </div>
+        <br>
+        <button class="btn-main" onclick="location.reload()">VOLVER AL MENÚ</button>
+    </div>
+</div>
+
+<script>
+    // Usamos el nombre de la "base de datos" que tenías antes para recuperar puntajes
+    const DB_NAME = 'tablas_records';
+    const TOTAL_Q = 20;
+    
+    let pool = [];
+    let currentIdx = 0;
+    let score = { c: 0, w: 0, s: 0 };
+    let gameHistory = [];
+    let timerInterval;
+    let startTime;
+
+    // Al cargar la página, dibujar la tabla
+    window.onload = function() {
+        updateRecordsTable('records-list-start');
+    };
+
+    function startGame() {
+        startTime = Date.now();
+        currentIdx = 0;
+        score = { c: 0, w: 0, s: 0 };
+        gameHistory = [];
+        
+        generatePool();
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function generatePool() {
+        let p10 = [], pRest = [];
+        [2,3,4,5,10].forEach(t => {
+            for(let n=2; n<=12; n++) {
+                let q = { a: t, b: n, ans: t * n };
+                t === 10 ? p10.push(q) : pRest.push(q);
+            }
+        });
+        p10.sort(() => Math.random() - 0.5);
+        pRest.sort(() => Math.random() - 0.5);
+        pool = [...p10.slice(0, 5), ...pRest.slice(0, 15)].sort(() => Math.random() - 0.5);
+    }
+
+    function showQuestion() {
+        if(currentIdx >= TOTAL_Q) return finishGame();
+        
+        document.getElementById('current-num').innerText = currentIdx + 1;
+        const q = pool[currentIdx];
+        document.getElementById('question').innerText = `${q.a} × ${q.b}`;
+        
+        // Distractores
+        let d = new Set([q.ans+1, q.ans-1, q.ans+2, Math.abs(q.ans-10)]);
+        let s = q.ans.toString();
+        if(s.length > 1) d.add(parseInt(s.split('').reverse().join('')));
+        
+        let opts = Array.from(d).filter(x => x !== q.ans).slice(0, 3);
+        opts.push(q.ans);
+        opts.sort(() => Math.random() - 0.5);
+
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach((btn, i) => {
+            btn.innerText = opts[i];
+            btn.disabled = false;
+        });
+
+        startTimerBar();
+    }
+
+    function startTimerBar() {
+        const bar = document.getElementById('timer-bar');
+        bar.style.transition = 'none';
+        bar.style.width = '100%';
+        
+        setTimeout(() => {
+            bar.style.transition = 'width 10s linear';
+            bar.style.width = '0%';
+        }, 50);
+
+        clearInterval(timerInterval);
+        let timeLeft = 10;
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                processAnswer(null);
+            }
+        }, 1000);
+    }
+
+    function handleSelect(btn) {
+        clearInterval(timerInterval);
+        processAnswer(parseInt(btn.innerText));
+    }
+
+    function processAnswer(userVal) {
+        const q = pool[currentIdx];
+        let status = "skipped";
+        
+        if (userVal !== null) {
+            if (userVal === q.ans) {
+                status = "correct";
+                score.c++;
+            } else {
+                status = "wrong";
+                score.w++;
+            }
+        } else {
+            score.s++;
+        }
+        
+        gameHistory.push({ q: `${q.a} × ${q.b}`, correct: q.ans, user: userVal, status: status });
+        currentIdx++;
+        showQuestion();
+    }
+
+    function finishGame() {
+        clearInterval(timerInterval);
+        const totalTime = ((Date.now() - startTime) / 1000).toFixed(2);
+        const grade = calculateGradeChile(score.c);
+        
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        
+        const gradeEl = document.getElementById('grade');
+        gradeEl.innerText = grade;
+        gradeEl.style.color = parseFloat(grade) >= 4.0 ? "#2980b9" : "#e74c3c";
+        
+        document.getElementById('achievement').innerText = grade == 7.0 ? "🏆" : (grade >= 4.0 ? "⭐" : "📚");
+        document.getElementById('res-time').innerText = totalTime;
+        document.getElementById('res-correct').innerText = score.c;
+        document.getElementById('res-wrong').innerText = score.w;
+        document.getElementById('res-skipped').innerText = score.s;
+
+        buildReviewList(gameHistory);
+        saveToRecords(grade, totalTime, gameHistory);
+    }
+
+    function calculateGradeChile(p) {
+        // Escala 60% exigencia para 20 preguntas (12 correctas = 4.0)
+        let g = (p < 12) ? 1.0 + (3.0 * (p / 12)) : 4.0 + (3.0 * ((p - 12) / 8));
+        return g.toFixed(1);
+    }
+
+    function buildReviewList(historyData) {
+        const panel = document.getElementById('review-panel');
+        if (!historyData) {
+            panel.innerHTML = "<p>No hay datos de revisión.</p>";
+            return;
+        }
+        panel.innerHTML = historyData.map((item, i) => `
+            <div class="review-item rev-${item.status}">
+                <b>${i + 1}. ${item.q} = ${item.correct}</b><br>
+                <span>Tu respuesta: ${item.user === null ? 'Omitida' : item.user}</span>
+            </div>
+        `).join('');
+    }
+
+    function toggleReview() {
+        const p = document.getElementById('review-panel');
+        p.classList.toggle('hidden');
+        if(!p.classList.contains('hidden')) p.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function saveToRecords(grade, time, hist) {
+        let records = JSON.parse(localStorage.getItem(DB_NAME) || '[]');
+        const newRecord = { grade: parseFloat(grade), time: parseFloat(time), date: new Date().toLocaleDateString(), history: hist };
+        records.push(newRecord);
+        records.sort((a, b) => b.grade - a.grade || a.time - b.time);
+        records = records.slice(0, 10);
+        localStorage.setItem(DB_NAME, JSON.stringify(records));
+        updateRecordsTable('records-list-end', newRecord);
+    }
+
+    function updateRecordsTable(tableId, current=null) {
+        const records = JSON.parse(localStorage.getItem(DB_NAME) || '[]');
+        const table = document.getElementById(tableId);
+        if(!table) return;
+
+        let html = `<tr><th>#</th><th>Nota</th><th>Tiempo</th><th>Fecha</th></tr>`;
+        if (records.length === 0) {
+            html += `<tr><td colspan="4">No hay récords aún</td></tr>`;
+        } else {
+            records.forEach((r, i) => {
+                const isCurrent = current && r.grade === current.grade && r.time === current.time;
+                const rowId = `row-${tableId}-${i}`;
+                html += `
+                    <tr class="${isCurrent ? 'current-record' : ''}" onclick="viewOldHistory(${i}, '${tableId}')">
+                        <td>${i + 1}</td>
+                        <td style="color:${r.grade >= 4.0 ? '#2980b9' : '#e74c3c'}">${r.grade.toFixed(1)}</td>
+                        <td>${r.time.toFixed(2)}s</td>
+                        <td>${r.date}</td>
+                    </tr>`;
+            });
+        }
+        table.innerHTML = html;
+    }
+
+    function viewOldHistory(index, tableId) {
+        const records = JSON.parse(localStorage.getItem(DB_NAME) || '[]');
+        const record = records[index];
+        if (record && record.history) {
+            buildReviewList(record.history);
+            const panel = document.getElementById('review-panel');
+            panel.classList.remove('hidden');
+            if(tableId === 'records-list-start') {
+                // Si está en el inicio, bajamos hasta el panel
+                panel.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                panel.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }
+
+    function clearAllData() {
+        if(confirm("¿Estás seguro de borrar todos los récords históricos?")) {
+            localStorage.removeItem(DB_NAME);
+            location.reload();
+        }
+    }
+</script>
+
+</body>
+</html>

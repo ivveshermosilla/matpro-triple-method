@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tablas Pro - Edición Maxitablas</title>
+    <style>
+        :root { --azul: #2980b9; --naranja: #e67e22; --rojo: #e74c3c; --verde: #27ae60; --gris: #7f8c8d; --fondo: #2c3e50; --purpura: #8e44ad; --dorado: #f1c40f; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--fondo); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: white; }
+        #quiz-container { background-color: #ecf0f1; padding: 25px; border-radius: 25px; width: 95%; max-width: 500px; text-align: center; color: #2c3e50; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+        .hidden { display: none !important; }
+        
+        /* Botones de Dificultad con HOVER */
+        .diff-btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; color: white; transition: all 0.2s ease; transform: scale(1); }
+        .diff-btn:hover { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .diff-btn:active { transform: scale(0.98); }
+
+        .btn-facil { background: var(--verde); }
+        .btn-medio { background: var(--azul); }
+        .btn-dificil { background: var(--naranja); }
+        .btn-experto { background: var(--purpura); }
+        .btn-maxi { background: #2d3436; border: 2px solid var(--dorado); color: var(--dorado); }
+        .btn-maxi:hover { background: var(--dorado); color: #2d3436; }
+
+        .instrucciones { text-align: left; background: #dfe6e9; padding: 18px; border-radius: 15px; font-size: 15px; margin: 15px 0; border-left: 8px solid var(--azul); line-height: 1.4; }
+        
+        /* Botones de Juego con HOVER */
+        .option-btn { display: block; width: 100%; padding: 16px; margin: 10px 0; font-size: 22px; font-weight: bold; cursor: pointer; background-color: var(--naranja); color: white; border: none; border-radius: 12px; transition: all 0.2s; -webkit-tap-highlight-color: transparent; }
+        .option-btn:hover:not(:disabled) { background-color: #d35400; transform: translateY(-2px); }
+        
+        #timer-bar-container { width: 100%; height: 14px; background-color: #bdc3c7; border-radius: 7px; margin: 15px 0; overflow: hidden; }
+        #timer-bar { width: 100%; height: 100%; background-color: var(--rojo); }
+        #question { font-size: 64px; margin: 10px 0; color: var(--azul); font-weight: 900; }
+        
+        #player-name-input { width: 90%; padding: 12px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 10px; text-align: center; }
+        
+        .records-table { width: 100%; border-collapse: collapse; font-size: 12px; background: white; border-radius: 10px; overflow: hidden; margin-top: 10px; table-layout: fixed; }
+        .records-table th { background: #34495e; color: white; padding: 10px; }
+        .records-table td { padding: 10px; border-bottom: 1px solid #eee; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        
+        .btn-main { padding: 18px; font-size: 20px; background-color: var(--verde); color: white; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; transition: 0.2s; }
+        .btn-main:hover { filter: brightness(1.1); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .btn-back { background: var(--gris); margin-top: 10px; padding: 10px; font-size: 14px; }
+        
+        #review-panel { text-align: left; background: white; padding: 15px; border-radius: 15px; max-height: 200px; overflow-y: auto; margin-top: 15px; border: 2px solid #bdc3c7; color: #333; }
+        .review-item { padding: 8px; border-bottom: 1px solid #eee; font-size: 13px; }
+        .current-record { background-color: #fff3cd !important; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="menu-screen">
+        <h1 style="margin-bottom:10px;">Tablas Pro 🏆</h1>
+        <p style="color:var(--gris); margin-bottom:20px; font-size: 14px;">¡Desafía tu mente!</p>
+        <button class="diff-btn btn-facil" onclick="selectDiff('facil')">FÁCIL</button>
+        <button class="diff-btn btn-medio" onclick="selectDiff('medio')">MEDIO</button>
+        <button class="diff-btn btn-dificil" onclick="selectDiff('dificil')">DIFÍCIL</button>
+        <button class="diff-btn btn-experto" onclick="selectDiff('experto')">EXPERTO</button>
+        <button class="diff-btn btn-maxi" onclick="selectDiff('maxi')">⭐ MAXITABLAS PRO ⭐</button>
+    </div>
+
+    <div id="prep-screen" class="hidden">
+        <h2 id="prep-title" style="margin-top:0;">Nivel</h2>
+        <div id="prep-desc" class="instrucciones"></div>
+        <button class="btn-main" onclick="initGame()">¡EMPEZAR!</button>
+        <button class="btn-main btn-back" onclick="showMenu()">VOLVER ATRÁS</button>
+        <h3 style="margin-top:25px; margin-bottom:5px;">TOP 10 HISTÓRICO</h3>
+        <table class="records-table" id="records-list-prep"></table>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div id="progress" style="font-weight:bold; color:var(--gris);">Pregunta <span id="current-num">1</span> / <span id="total-num">20</span></div>
+        <div id="timer-bar-container"><div id="timer-bar"></div></div>
+        <div id="question">? × ?</div>
+        <div id="options">
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2 style="margin:0">Resultado Final</h2>
+        <div id="grade" style="font-size:65px; font-weight:900; margin:5px 0;">1.0</div>
+        <div style="background:#dfe6e9; padding:12px; border-radius:15px; margin-bottom:15px;">
+            <p id="expert-penalty-msg" class="hidden" style="color:var(--rojo); font-weight:bold; margin:0 0 5px 0; font-size:12px;">⚠️ Penalización aplicada</p>
+            <p style="margin:5px 0;">⏱️ Tiempo Total: <span id="res-time">0</span>s</p>
+            <p style="margin:5px 0;">✅ <span id="res-correct">0</span> | ❌ <span id="res-wrong">0</span></p>
+        </div>
+
+        <div id="name-entry-container">
+            <h4 style="margin:0 0 10px 0">🏆 ¡Registra tu Récord!</h4>
+            <input type="text" id="player-name-input" placeholder="Tu nombre..." maxlength="50">
+            <div>
+                <button class="btn-main" style="padding:12px; width:45%; display:inline-block;" onclick="saveResult()">GUARDAR</button>
+                <button class="btn-main btn-back" style="padding:12px; width:45%; display:inline-block; margin:0;" onclick="saveResult(true)">SALTAR</button>
+            </div>
+        </div>
+
+        <button class="btn-main" style="background:var(--azul); font-size:15px; padding:10px;" onclick="toggleReview()">VER REVISIÓN</button>
+        <div id="review-panel" class="hidden"></div>
+        <button class="btn-main btn-back" onclick="location.reload()">MENÚ PRINCIPAL</button>
+    </div>
+</div>
+
+<script>
+    const DB_PREFIX = 'tablas_v12_';
+    let currentDiff = 'facil';
+    let pool = [], currentIdx = 0, score = { c:0, w:0 }, history = [], timer, startTime, finalGrade, finalTime;
+
+    const DIFF_CONFIG = {
+        facil: { name: "FÁCIL", time: 15, qCount: 20, desc: "• 15s por pregunta<br>• Incluye tabla del 1 y recíprocos<br>• ¡Ideal para empezar!", penalty: false },
+        medio: { name: "MEDIO", time: 12, qCount: 20, desc: "• 12s por pregunta<br>• Sin tabla del 1<br>• Tablas 2, 5 y 10 limitadas", penalty: false },
+        dificil: { name: "DIFÍCIL", time: 10, qCount: 20, desc: "• 10s por pregunta<br>• Sin tabla del 1 ni recíprocos<br>• Tablas 2, 5 y 10 limitadas", penalty: false },
+        experto: { name: "EXPERTO", time: 8, qCount: 20, desc: "• 8s por pregunta<br>• Sin recíprocos<br>• -1 buena por cada 2 malas", penalty: true },
+        maxi: { name: "MAXITABLAS PRO", time: 10, qCount: 144, desc: "• 10s por pregunta<br>• <b>144 PREGUNTAS:</b> Todas las tablas (1-12)<br>• Sin repeticiones, orden aleatorio", penalty: false }
+    };
+
+    function showMenu() {
+        document.getElementById('menu-screen').classList.remove('hidden');
+        document.getElementById('prep-screen').classList.add('hidden');
+    }
+
+    function selectDiff(d) {
+        currentDiff = d;
+        const conf = DIFF_CONFIG[d];
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('prep-screen').classList.remove('hidden');
+        document.getElementById('prep-title').innerText = conf.name;
+        document.getElementById('prep-desc').innerHTML = conf.desc + "<br><br><b>¡Buena Suerte Campeón! 🍀</b>";
+        renderTable('records-list-prep');
+    }
+
+    function genPool() {
+        const conf = DIFF_CONFIG[currentDiff];
+        let localPool = [];
+        let usedKeys = new Set();
+
+        if (currentDiff === 'maxi') {
+            for(let i=1; i<=12; i++) {
+                for(let j=1; j<=12; j++) {
+                    localPool.push({a: i, b: j});
+                }
+            }
+        } else if (currentDiff === 'facil') {
+            while(localPool.length < 20) {
+                localPool.push({a: Math.floor(Math.random()*12)+1, b: Math.floor(Math.random()*12)+1});
+            }
+        } else {
+            const createBucket = (tables, limit) => {
+                let items = [];
+                tables.forEach(t => {
+                    for(let f=2; f<=12; f++) {
+                        let key = (currentDiff==='dificil'||currentDiff==='experto') ? [t, f].sort((a,b)=>a-b).join('x') : `${t}x${f}`;
+                        if (!usedKeys.has(key)) { usedKeys.add(key); items.push({a: t, b: f, k: key}); }
+                    }
+                });
+                return items.sort(()=>Math.random()-0.5).slice(0, limit);
+            };
+            localPool.push(...createBucket([2], 3), ...createBucket([5], 3), ...createBucket([10], 3), ...createBucket([3,4,6,7,8,9,11,12], 11));
+        }
+        pool = localPool.sort(() => Math.random() - 0.5).slice(0, conf.qCount);
+    }
+
+    function initGame() {
+        currentIdx = 0; score = { c:0, w:0 }; history = [];
+        genPool();
+        document.getElementById('total-num').innerText = pool.length;
+        document.getElementById('prep-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        startTime = Date.now();
+        showQ();
+    }
+
+    function showQ() {
+        if(currentIdx >= pool.length) return finish();
+        document.getElementById('current-num').innerText = currentIdx + 1;
+        const q = pool[currentIdx];
+        document.getElementById('question').innerText = `${q.a} × ${q.b}`;
+        
+        const ans = q.a * q.b;
+        let opts = new Set([ans]);
+        opts.add(ans + (Math.random() > 0.5 ? 1 : -1));
+        opts.add(q.a * (Math.floor(Math.random()*11)+2));
+        while(opts.size < 4) opts.add(Math.floor(Math.random()*144)+1);
+
+        const finalOpts = Array.from(opts).sort(() => Math.random() - 0.5);
+        document.querySelectorAll('.option-btn').forEach((b, i) => { b.innerText = finalOpts[i]; b.disabled = false; });
+        resetTimer();
+    }
+
+    function resetTimer() {
+        const conf = DIFF_CONFIG[currentDiff];
+        const bar = document.getElementById('timer-bar');
+        bar.style.transition = 'none'; bar.style.width = '100%';
+        setTimeout(() => { bar.style.transition = `width ${conf.time}s linear`; bar.style.width = '0%'; }, 50);
+        clearInterval(timer);
+        let left = conf.time;
+        timer = setInterval(() => { left--; if(left <= 0) { clearInterval(timer); next(null); } }, 1000);
+    }
+
+    function handleSelect(btn) { clearInterval(timer); next(parseInt(btn.innerText)); }
+
+    function next(val) {
+        const q = pool[currentIdx];
+        const ans = q.a * q.b;
+        let status = val === ans ? "correct" : (val === null ? "skipped" : "wrong");
+        if(status === "correct") score.c++; else score.w++;
+        history.push({ q: `${q.a}×${q.b}`, correct: ans, user: val, status: status });
+        currentIdx++; showQ();
+    }
+
+    function finish() {
+        clearInterval(timer);
+        finalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+        let eff = score.c;
+        if(DIFF_CONFIG[currentDiff].penalty) {
+            eff = Math.max(0, score.c - Math.floor(score.w/2));
+            document.getElementById('expert-penalty-msg').classList.remove('hidden');
+        } else {
+            document.getElementById('expert-penalty-msg').classList.add('hidden');
+        }
+
+        const total = pool.length;
+        const base = total * 0.6; // Escala 60%
+        let g = (eff < base) ? 1.0 + (3.0 * (eff / base)) : 4.0 + (3.0 * ((eff - base) / (total - base)));
+        finalGrade = g.toFixed(1);
+
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        const gEl = document.getElementById('grade');
+        gEl.innerText = finalGrade;
+        gEl.style.color = finalGrade >= 4.0 ? 'var(--verde)' : 'var(--rojo)';
+        document.getElementById('res-time').innerText = finalTime;
+        document.getElementById('res-correct').innerText = score.c;
+        document.getElementById('res-wrong').innerText = score.w;
+        buildRev(history);
+        renderTable('records-list-end');
+    }
+
+    function saveResult(skip = false) {
+        const name = skip ? "Anónimo" : (document.getElementById('player-name-input').value.trim() || "Anónimo");
+        let recs = JSON.parse(localStorage.getItem(DB_PREFIX + currentDiff) || '[]');
+        recs.push({ name, grade: parseFloat(finalGrade), time: parseFloat(finalTime), history });
+        recs.sort((a,b) => b.grade - a.grade || a.time - b.time);
+        localStorage.setItem(DB_PREFIX + currentDiff, JSON.stringify(recs.slice(0,10)));
+        document.getElementById('name-entry-container').classList.add('hidden');
+        renderTable('records-list-end');
+    }
+
+    function renderTable(id) {
+        const recs = JSON.parse(localStorage.getItem(DB_PREFIX + currentDiff) || '[]');
+        const t = document.getElementById(id);
+        let html = `<tr><th>Nombre</th><th>Nota</th><th>Tiempo</th></tr>`;
+        recs.forEach(r => {
+            html += `<tr><td>${r.name}</td><td style="color:${r.grade>=4?'var(--verde)':'var(--rojo)'}; font-weight:bold;">${r.grade.toFixed(1)}</td><td>${r.time}s</td></tr>`;
+        });
+        t.innerHTML = html;
+    }
+
+    function buildRev(data) {
+        document.getElementById('review-panel').innerHTML = data.map((x, i) => `
+            <div class="review-item rev-${x.status}">
+                <b>${i+1}. ${x.q} = ${x.correct}</b><br>
+                Respondiste: ${x.user === null ? 'Omitida' : x.user}
+            </div>
+        `).join('');
+    }
+
+    function toggleReview() { document.getElementById('review-panel').classList.toggle('hidden'); }
+</script>
+</body>
+</html>

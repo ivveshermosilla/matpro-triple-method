@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tablas Pro - Edición Amigable</title>
+    <style>
+        :root { --azul: #2980b9; --naranja: #e67e22; --rojo: #e74c3c; --verde: #27ae60; --gris: #7f8c8d; --fondo: #2c3e50; --purpura: #8e44ad; --dorado: #f1c40f; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--fondo); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: white; }
+        #quiz-container { background-color: #ecf0f1; padding: 25px; border-radius: 25px; width: 95%; max-width: 500px; text-align: center; color: #2c3e50; box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; }
+        .hidden { display: none !important; }
+        
+        /* Botones Principales con Hover */
+        .diff-btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; color: white; transition: all 0.2s ease; }
+        .diff-btn:hover { transform: scale(1.02); filter: brightness(1.1); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        .btn-facil { background: var(--verde); }
+        .btn-medio { background: var(--azul); }
+        .btn-dificil { background: var(--naranja); }
+        .btn-experto { background: var(--purpura); }
+        .btn-maxi { background: #2d3436; border: 2px solid var(--dorado); color: var(--dorado); }
+
+        /* Pantalla de Preparación (Descripciones Amigables) */
+        .instrucciones { text-align: left; background: #dfe6e9; padding: 20px; border-radius: 15px; font-size: 16px; margin: 15px 0; border-left: 8px solid var(--azul); line-height: 1.6; }
+        .instrucciones p { margin: 8px 0; display: flex; align-items: center; gap: 10px; }
+        
+        /* Juego */
+        .option-btn { display: block; width: 100%; padding: 16px; margin: 10px 0; font-size: 22px; font-weight: bold; cursor: pointer; background-color: var(--naranja); color: white; border: none; border-radius: 12px; transition: 0.2s; }
+        .option-btn:hover { background-color: #d35400; }
+        #timer-bar-container { width: 100%; height: 14px; background-color: #bdc3c7; border-radius: 7px; margin: 15px 0; overflow: hidden; }
+        #timer-bar { width: 100%; height: 100%; background-color: var(--rojo); }
+        #question { font-size: 64px; margin: 10px 0; color: var(--azul); font-weight: 900; }
+        
+        /* Tablas y Ranking */
+        .records-table { width: 100%; border-collapse: collapse; font-size: 12px; background: white; border-radius: 10px; overflow: hidden; margin-top: 5px; table-layout: fixed; }
+        .records-table th { background: #34495e; color: white; padding: 10px; }
+        .records-table td { padding: 10px; border-bottom: 1px solid #eee; color: #333; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+        .records-table tr:hover td { background-color: #f1f2f6; }
+
+        .btn-main { padding: 18px; font-size: 18px; background-color: var(--verde); color: white; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; }
+        .btn-main:hover { filter: brightness(1.1); }
+        .btn-back { background: var(--gris); margin-top: 10px; padding: 10px; font-size: 14px; }
+        
+        #review-panel { text-align: left; background: white; padding: 15px; border-radius: 15px; max-height: 250px; overflow-y: auto; margin-top: 15px; border: 2px solid #bdc3c7; color: #333; }
+        .review-item { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; margin-bottom: 5px; border-radius: 5px; }
+        .rev-correct { border-left: 6px solid var(--verde); background: #f0fff4; }
+        .rev-wrong { border-left: 6px solid var(--rojo); background: #fff5f5; }
+        .rev-skipped { border-left: 6px solid var(--gris); background: #f8f9fa; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="menu-screen">
+        <h1 style="margin-bottom:10px;">Tablas Pro 🏆</h1>
+        <p style="color:var(--gris); margin-bottom:20px;">Selecciona tu nivel:</p>
+        <button class="diff-btn btn-facil" onclick="selectDiff('facil')">FÁCIL</button>
+        <button class="diff-btn btn-medio" onclick="selectDiff('medio')">MEDIO</button>
+        <button class="diff-btn btn-dificil" onclick="selectDiff('dificil')">DIFÍCIL</button>
+        <button class="diff-btn btn-experto" onclick="selectDiff('experto')">EXPERTO</button>
+        <button class="diff-btn btn-maxi" onclick="selectDiff('maxi')">⭐ MAXITABLAS PRO ⭐</button>
+    </div>
+
+    <div id="prep-screen" class="hidden">
+        <h2 id="prep-title" style="margin:0; color: var(--azul);">Nivel</h2>
+        <div id="prep-desc-container" class="instrucciones">
+            </div>
+        <button class="btn-main" onclick="initGame()">¡LISTO PARA EMPEZAR!</button>
+        <button class="btn-main btn-back" onclick="showMenu()">VOLVER ATRÁS</button>
+        
+        <h3 style="margin:15px 0 5px 0; font-size:16px;">TOP 10 HISTÓRICO</h3>
+        <p style="font-size:10px; color:var(--gris); margin:0 0 5px 0;">(Toca un récord para revisar los errores)</p>
+        <table class="records-table" id="records-list-prep"></table>
+        <div id="prep-review-area" class="hidden">
+            <div id="review-panel"></div>
+        </div>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div id="progress" style="font-weight:bold; color:var(--gris);">Pregunta <span id="current-num">1</span> / <span id="total-num">20</span></div>
+        <div id="timer-bar-container"><div id="timer-bar"></div></div>
+        <div id="question">? × ?</div>
+        <div id="options">
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+            <button class="option-btn" onclick="handleSelect(this)"></button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2 style="margin:0">Resultado</h2>
+        <div id="grade" style="font-size:65px; font-weight:900; margin:5px 0;">1.0</div>
+        <div style="background:#dfe6e9; padding:12px; border-radius:15px; margin-bottom:15px; color:#2c3e50;">
+            <p id="expert-penalty-msg" class="hidden" style="color:var(--rojo); font-weight:bold; margin:0; font-size:12px;">⚠️ Penalización por errores aplicada</p>
+            <p style="margin:5px 0;">⏱️ Tiempo: <span id="res-time">0</span>s | ✅ <span id="res-correct">0</span> | ❌ <span id="res-wrong">0</span></p>
+        </div>
+
+        <div id="name-entry-container">
+            <input type="text" id="player-name-input" placeholder="Tu nombre o apodo..." maxlength="50" style="width:90%; padding:12px; border-radius:8px; border:2px solid #ddd; text-align:center;">
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn-main" style="flex:1; padding:12px;" onclick="saveResult()">GUARDAR</button>
+                <button class="btn-main btn-back" style="flex:1; margin:0;" onclick="saveResult(true)">SALTAR</button>
+            </div>
+        </div>
+
+        <button class="btn-main" style="background:var(--azul); font-size:14px; padding:10px; margin-top:15px;" onclick="toggleReview()">VER MI REVISIÓN</button>
+        <div id="result-review-panel" class="hidden">
+            <div id="review-panel-content"></div>
+        </div>
+        <button class="btn-main btn-back" style="width:100%; padding:15px;" onclick="location.reload()">VOLVER AL INICIO</button>
+    </div>
+</div>
+
+<script>
+    const DB_PREFIX = 'tablas_v14_';
+    let currentDiff = 'facil';
+    let pool = [], currentIdx = 0, score = { c:0, w:0 }, history = [], timer, startTime, finalGrade, finalTime;
+
+    const DIFF_CONFIG = {
+        facil: { 
+            name: "Modo Fácil 🟢", 
+            time: 15, 
+            qCount: 20, 
+            msg: "🍀 ¡Buena suerte campeón!",
+            rules: ["✅ 20 Preguntas", "⏱️ 15 segundos para responder", "🔢 Incluye tabla del 1", "🔄 Se permiten preguntas cruzadas (4x5 y 5x4)"]
+        },
+        medio: { 
+            name: "Modo Medio 🔵", 
+            time: 12, 
+            qCount: 20, 
+            msg: "🚀 ¡Tú puedes lograrlo!",
+            rules: ["✅ 20 Preguntas", "⏱️ 12 segundos para responder", "🚫 No incluye tabla del 1", "🔄 Se permiten preguntas cruzadas"]
+        },
+        dificil: { 
+            name: "Modo Difícil 🟠", 
+            time: 10, 
+            qCount: 20, 
+            msg: "🔥 ¡Demuestra lo que sabes!",
+            rules: ["✅ 20 Preguntas", "⏱️ 10 segundos para responder", "🚫 Sin tabla del 1", "🙅 Sin preguntas cruzadas"]
+        },
+        experto: { 
+            name: "Modo Experto 🟣", 
+            time: 8, 
+            qCount: 20, 
+            msg: "🧠 ¡Solo para genios!",
+            rules: ["✅ 20 Preguntas", "⏱️ 8 segundos para responder", "⚠️ Penalización: -1 buena por cada 2 malas", "🚫 Sin tabla del 1 ni preguntas cruzadas"]
+        },
+        maxi: { 
+            name: "Maxitablas Pro 🏆", 
+            time: 10, 
+            qCount: 144, 
+            msg: "🎖️ ¡Un desafío de leyenda!",
+            rules: ["✅ 144 Preguntas (Todas las tablas)", "⏱️ 10 segundos para responder", "♾️ Sin repeticiones, orden aleatorio", "⚪ Si no respondes se cuenta como omitida"]
+        }
+    };
+
+    function showMenu() {
+        document.getElementById('menu-screen').classList.remove('hidden');
+        document.getElementById('prep-screen').classList.add('hidden');
+    }
+
+    function selectDiff(d) {
+        currentDiff = d;
+        const conf = DIFF_CONFIG[d];
+        const descContainer = document.getElementById('prep-desc-container');
+        
+        document.getElementById('menu-screen').classList.add('hidden');
+        document.getElementById('prep-screen').classList.remove('hidden');
+        document.getElementById('prep-title').innerText = conf.name;
+        
+        // Construir HTML amigable
+        let html = "";
+        conf.rules.forEach(rule => {
+            html += `<p>${rule}</p>`;
+        });
+        html += `<p style="display:block; text-align:center; font-weight:bold; color:var(--azul); margin-top:15px; font-size:18px;">${conf.msg}</p>`;
+        
+        descContainer.innerHTML = html;
+        document.getElementById('prep-review-area').classList.add('hidden');
+        renderTable('records-list-prep');
+    }
+
+    // --- Lógica de Juego (Idéntica a la anterior pero ajustando pool) ---
+
+    function genPool() {
+        const conf = DIFF_CONFIG[currentDiff];
+        let localPool = [];
+        if (currentDiff === 'maxi') {
+            for(let i=1; i<=12; i++) for(let j=1; j<=12; j++) localPool.push({a: i, b: j});
+        } else if (currentDiff === 'facil') {
+            while(localPool.length < 20) localPool.push({a: Math.floor(Math.random()*12)+1, b: Math.floor(Math.random()*12)+1});
+        } else {
+            const createBucket = (tables) => {
+                let items = [];
+                tables.forEach(t => {
+                    for(let f=2; f<=12; f++) {
+                        let key = (currentDiff==='dificil'||currentDiff==='experto') ? [t, f].sort((a,b)=>a-b).join('x') : `${t}x${f}`;
+                        items.push({a: t, b: f, k: key});
+                    }
+                });
+                return items.sort(()=>Math.random()-0.5);
+            };
+            let b2 = createBucket([2]), b5 = createBucket([5]), b10 = createBucket([10]), bH = createBucket([3,4,6,7,8,9,11,12]);
+            let used = new Set();
+            const pick = (list, n) => {
+                let count = 0;
+                for(let item of list) {
+                    if(count >= n) break;
+                    if(!used.has(item.k)) { used.add(item.k); localPool.push(item); count++; }
+                }
+            };
+            pick(b2, 3); pick(b5, 3); pick(b10, 3); pick(bH, 11);
+        }
+        pool = localPool.sort(() => Math.random() - 0.5).slice(0, conf.qCount);
+    }
+
+    function initGame() {
+        currentIdx = 0; score = { c:0, w:0 }; history = [];
+        genPool();
+        document.getElementById('total-num').innerText = pool.length;
+        document.getElementById('prep-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        startTime = Date.now();
+        showQ();
+    }
+
+    function showQ() {
+        if(currentIdx >= pool.length) return finish();
+        document.getElementById('current-num').innerText = currentIdx + 1;
+        const q = pool[currentIdx];
+        const ans = q.a * q.b;
+        document.getElementById('question').innerText = `${q.a} × ${q.b}`;
+        
+        let opts = new Set([ans, ans+(Math.random()>0.5?1:-1), q.a*(Math.floor(Math.random()*11)+2)]);
+        while(opts.size < 4) opts.add(Math.floor(Math.random()*144)+1);
+
+        const finalOpts = Array.from(opts).sort(() => Math.random() - 0.5);
+        document.querySelectorAll('.option-btn').forEach((b, i) => { b.innerText = finalOpts[i]; b.disabled = false; });
+        resetTimer();
+    }
+
+    function resetTimer() {
+        const conf = DIFF_CONFIG[currentDiff];
+        const bar = document.getElementById('timer-bar');
+        bar.style.transition = 'none'; bar.style.width = '100%';
+        setTimeout(() => { bar.style.transition = `width ${conf.time}s linear`; bar.style.width = '0%'; }, 50);
+        clearInterval(timer);
+        let left = conf.time;
+        timer = setInterval(() => { left--; if(left <= 0) { clearInterval(timer); next(null); } }, 1000);
+    }
+
+    function handleSelect(btn) { clearInterval(timer); next(parseInt(btn.innerText)); }
+
+    function next(val) {
+        const q = pool[currentIdx];
+        const ans = q.a * q.b;
+        let status = val === ans ? "correct" : (val === null ? "skipped" : "wrong");
+        if(status === "correct") score.c++; else score.w++;
+        history.push({ q: `${q.a}×${q.b}`, correct: ans, user: val, status: status });
+        currentIdx++; showQ();
+    }
+
+    function finish() {
+        clearInterval(timer);
+        finalTime = ((Date.now() - startTime) / 1000).toFixed(1);
+        let eff = score.c;
+        if(DIFF_CONFIG[currentDiff].penalty) eff = Math.max(0, score.c - Math.floor(score.w/2));
+        const total = pool.length;
+        const base = total * 0.6;
+        let g = (eff < base) ? 1.0 + (3.0 * (eff / base)) : 4.0 + (3.0 * ((eff - base) / (total - base)));
+        finalGrade = g.toFixed(1);
+
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+        const gEl = document.getElementById('grade');
+        gEl.innerText = finalGrade;
+        gEl.style.color = finalGrade >= 4.0 ? 'var(--verde)' : 'var(--rojo)';
+        document.getElementById('res-time').innerText = finalTime;
+        document.getElementById('res-correct').innerText = score.c;
+        document.getElementById('res-wrong').innerText = score.w;
+        if(DIFF_CONFIG[currentDiff].penalty) document.getElementById('expert-penalty-msg').classList.remove('hidden');
+        buildRev('review-panel-content', history);
+        renderTable('records-list-end');
+    }
+
+    function saveResult(skip = false) {
+        const name = skip ? "Anónimo" : (document.getElementById('player-name-input').value.trim() || "Anónimo");
+        let recs = JSON.parse(localStorage.getItem(DB_PREFIX + currentDiff) || '[]');
+        recs.push({ name, grade: parseFloat(finalGrade), time: parseFloat(finalTime), history });
+        recs.sort((a,b) => b.grade - a.grade || a.time - b.time);
+        localStorage.setItem(DB_PREFIX + currentDiff, JSON.stringify(recs.slice(0,10)));
+        document.getElementById('name-entry-container').classList.add('hidden');
+        renderTable('records-list-end');
+    }
+
+    function renderTable(id) {
+        const recs = JSON.parse(localStorage.getItem(DB_PREFIX + currentDiff) || '[]');
+        const t = document.getElementById(id);
+        let html = `<tr><th>Nombre</th><th>Nota</th><th>Tiempo</th></tr>`;
+        recs.forEach((r, idx) => {
+            html += `<tr onclick="viewHistoricalRev(${idx})"><td>${r.name}</td><td style="color:${r.grade>=4?'var(--verde)':'var(--rojo)'}; font-weight:bold;">${r.grade.toFixed(1)}</td><td>${r.time}s</td></tr>`;
+        });
+        t.innerHTML = html;
+    }
+
+    function buildRev(containerId, data, title="") {
+        const container = document.getElementById(containerId);
+        let html = title ? `<div style="font-weight:bold; color:var(--azul); margin-bottom:10px; text-align:center;">${title}</div>` : "";
+        html += data.map((x, i) => `
+            <div class="review-item rev-${x.status}">
+                <b>${i+1}. ${x.q} = ${x.correct}</b><br>
+                Respondiste: ${x.user === null ? '<i>Omitida</i>' : x.user}
+            </div>
+        `).join('');
+        container.innerHTML = html;
+    }
+
+    function viewHistoricalRev(idx) {
+        const recs = JSON.parse(localStorage.getItem(DB_PREFIX + currentDiff) || '[]');
+        const data = recs[idx];
+        if(data) {
+            buildRev('review-panel', data.history, `Detalle de: ${data.name}`);
+            document.getElementById('prep-review-area').classList.remove('hidden');
+            document.getElementById('prep-review-area').scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function toggleReview() { document.getElementById('result-review-panel').classList.toggle('hidden'); }
+</script>
+</body>
+</html>

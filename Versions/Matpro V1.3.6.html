@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tablas Pro 👑 - Modo Experto Fix</title>
+    <style>
+        :root { --azul: #2980b9; --naranja: #e67e22; --rojo: #e74c3c; --verde: #27ae60; --gris: #7f8c8d; --fondo: #2c3e50; --purpura: #8e44ad; --dorado: #f1c40f; }
+        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--fondo); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: white; overflow: hidden; }
+        
+        #quiz-container { background-color: #ecf0f1; padding: 25px; border-radius: 25px; width: 95%; max-width: 550px; max-height: 95vh; text-align: center; color: #2c3e50; box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; overflow-y: auto; display: flex; flex-direction: column; }
+        .hidden { display: none !important; }
+        
+        button { transition: all 0.2s ease; cursor: pointer; border: none; }
+        button:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        .mode-btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 20px; font-size: 20px; font-weight: 900; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
+        .btn-pro { background: var(--azul); color: white; }
+        .btn-maxi { background: #2d3436; border: 3px solid var(--dorado); color: var(--dorado); }
+
+        .config-section { text-align: left; background: white; padding: 12px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #ddd; }
+        .config-label { font-weight: bold; font-size: 13px; color: var(--azul); display: block; margin-bottom: 5px; }
+        .val-badge { background: var(--azul); color: white; padding: 4px 10px; border-radius: 8px; font-weight: bold; float: right; }
+
+        .tables-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+        .table-chip { background: #eee; border: 2px solid #ddd; padding: 8px 0; border-radius: 8px; font-weight: bold; font-size: 13px; text-align: center; }
+        .table-chip.active { background: var(--verde); color: white; border-color: #1e8449; }
+
+        .records-table { width: 100%; border-collapse: collapse; font-size: 11px; background: white; border-radius: 10px; overflow: hidden; margin-top: 5px; }
+        .records-table th { background: #34495e; color: white; padding: 8px; font-size: 10px; }
+        .records-table td { padding: 10px 5px; border-bottom: 1px solid #eee; color: #333; text-align: center; line-height: 1.2; }
+        
+        .badge-mode { padding: 2px 5px; border-radius: 4px; font-size: 9px; font-weight: bold; color: white; display: inline-block; }
+        
+        .scroll-subwindow { background: #f8f9fa; border: 2px solid #bdc3c7; border-radius: 15px; max-height: 140px; overflow-y: auto; margin: 10px 0; padding: 10px; text-align: left; }
+        .review-item { padding: 8px; border-bottom: 1px solid #eee; font-size: 12px; margin-bottom: 4px; border-radius: 6px; }
+        .rev-correct { border-left: 5px solid var(--verde); background: #f0fff4; }
+        .rev-wrong { border-left: 5px solid var(--rojo); background: #fff5f5; }
+        .rev-skipped { border-left: 5px solid var(--gris); background: #f1f2f6; color: var(--gris); }
+
+        .btn-main { padding: 16px; font-size: 18px; background-color: var(--verde); color: white; border-radius: 15px; font-weight: bold; width: 100%; margin-top: 10px; }
+        .option-btn { width: 100%; padding: 15px; margin: 5px 0; font-size: 24px; font-weight: 900; background: var(--naranja); color: white; border-radius: 15px; box-shadow: 0 4px 0 #d35400; }
+        
+        .res-card { background: white; padding: 15px; border-radius: 20px; border: 1px solid #ddd; margin-bottom: 10px; }
+        .res-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px dashed #eee; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="mode-screen">
+        <h1 style="margin:0 0 10px 0;">Tablas Pro 👑</h1>
+        <button class="mode-btn btn-pro" onclick="showConfig()">Practica las tablas 👑</button>
+        <button class="mode-btn btn-maxi" onclick="startMaxi()">Maxitablas Pro ⭐</button>
+        
+        <div style="margin-top: 15px;">
+            <div style="background:#34495e; color:white; padding:8px; font-weight:bold; font-size:12px; border-radius:10px 10px 0 0;">🏆 TOP 10 RÁNKING</div>
+            <table class="records-table">
+                <thead>
+                    <tr>
+                        <th style="text-align:left; padding-left:10px;">Jugador</th>
+                        <th>Modo</th>
+                        <th>Nota</th>
+                        <th>✅/❌/⚪</th>
+                    </tr>
+                </thead>
+                <tbody id="ranking-body"></tbody>
+            </table>
+            <button onclick="resetRanking()" style="background:none; color:var(--rojo); font-size:10px; text-decoration:underline; border:none; margin-top:10px;">Resetear Scoreboard</button>
+            <div id="historical-review-area" class="hidden">
+                <p style="font-size:11px; margin:10px 0 5px 0; font-weight:bold; color:var(--azul);">Revisión del Récord:</p>
+                <div id="historical-scroll-window" class="scroll-subwindow"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="config-screen" class="hidden">
+        <h2 style="margin:0 0 5px 0; color:var(--azul);">Configuración</h2>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 15px;">
+            <button onclick="applyPreset('facil')" style="background:var(--verde); color:white; padding:8px; border-radius:8px; font-size:10px; font-weight:bold;">FÁCIL</button>
+            <button onclick="applyPreset('medio')" style="background:var(--azul); color:white; padding:8px; border-radius:8px; font-size:10px; font-weight:bold;">MEDIO</button>
+            <button onclick="applyPreset('dificil')" style="background:var(--naranja); color:white; padding:8px; border-radius:8px; font-size:10px; font-weight:bold;">DIFÍCIL</button>
+            <button onclick="applyPreset('experto')" style="background:var(--purpura); color:white; padding:8px; border-radius:8px; font-size:10px; font-weight:bold;">EXPERTO</button>
+        </div>
+
+        <div id="expert-alert" style="background:#fff3f3; color:var(--rojo); padding:10px; border-radius:12px; font-size:11px; font-weight:bold; margin-bottom:10px; border:1px solid var(--rojo); display:none;">
+            ⚠️ MODO EXPERTO ACTIVADO:<br>Se restará 1 acierto por cada 2 errores/omitidas.
+        </div>
+
+        <div class="config-section">
+            <label class="config-label">Preguntas: <span id="val-q" class="val-badge">20</span></label>
+            <input type="range" id="range-q" min="1" max="100" value="20" style="width:100%" oninput="updateVal('q', this.value)">
+        </div>
+        <div class="config-section">
+            <label class="config-label">Tiempo (seg): <span id="val-t" class="val-badge">15</span></label>
+            <input type="range" id="range-t" min="1" max="30" value="15" style="width:100%" oninput="updateVal('t', this.value)">
+        </div>
+        <div class="config-section">
+            <label class="config-label">Tablas a practicar:</label>
+            <div class="tables-grid" id="tables-grid"></div>
+        </div>
+        <button class="btn-main" onclick="initGame()">¡TODO LISTO!</button>
+        <button class="btn-main" style="background:var(--gris); padding:10px; font-size:14px;" onclick="location.reload()">VOLVER</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div id="cancel-confirm" style="position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(44,62,80,0.97); z-index:100; display:flex; flex-direction:column; justify-content:center; align-items:center; border-radius:25px; padding:20px; color:white;" class="hidden">
+            <h3>¿Abandonar partida?</h3>
+            <p>Volviendo en: <span id="cancel-timer" style="font-size:24px; font-weight:bold; color:var(--dorado)">5</span>s</p>
+            <button class="btn-main" style="background:var(--verde)" onclick="abortCancel()">CONTINUAR JUGANDO</button>
+        </div>
+        <button style="background:var(--rojo); color:white; padding:8px 15px; border-radius:10px; font-size:11px; font-weight:bold; margin-bottom:15px;" onclick="triggerCancel()">✖ ABANDONAR PARTIDA</button>
+        <div style="font-weight:bold; color:var(--gris); font-size:14px;">Pregunta <span id="current-num">1</span> / <span id="total-num">20</span></div>
+        <div style="width:100%; height:12px; background:#ddd; border-radius:6px; margin:10px 0; overflow:hidden;"><div id="timer-bar" style="width:100%; height:100%; background:var(--rojo);"></div></div>
+        <div id="question" style="font-size:75px; font-weight:900; color:var(--azul); margin:15px 0;">? × ?</div>
+        <div id="options-container"></div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h2 style="margin:0 0 10px 0;">Resumen Final</h2>
+        <div class="res-card">
+            <div class="res-row" style="font-size: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+                <span>Nota Final:</span>
+                <span id="grade" style="color:var(--azul); font-size: 35px;">1.0</span>
+            </div>
+            <div class="res-row" style="color: var(--verde);"><span>Correctas:</span><span>✅ <span id="res-correct">0</span></span></div>
+            <div class="res-row" style="color: var(--rojo);"><span>Incorrectas:</span><span>❌ <span id="res-wrong">0</span></span></div>
+            <div class="res-row" style="color: var(--gris);"><span>Omitidas:</span><span>⚪ <span id="res-skipped">0</span></span></div>
+        </div>
+        <div id="result-scroll-window" class="scroll-subwindow"></div>
+        <input type="text" id="player-name-input" placeholder="Tu nombre..." maxlength="15" style="width:85%; padding:15px; border-radius:12px; border:2px solid #ddd; text-align:center; font-size:18px; margin-top:10px;">
+        <button class="btn-main" onclick="saveResult()">GUARDAR RECORD</button>
+        <button class="btn-main" style="background:var(--gris)" onclick="location.reload()">SALIR AL MENÚ</button>
+    </div>
+</div>
+
+<script>
+    const DB_KEY = 'tablas_pro_v30_records';
+    let config = { q: 20, t: 15, tables: [1,2,3,4,5,6,7,8,9,10,11,12], penalty: false, diffName: 'Manual' };
+    let pool = [], currentIdx = 0, score = { c:0, w:0, s:0 }, history = [], timer, timeLeft = 0, isPaused = false, currentMode = '👑';
+    let cancelInterval;
+
+    const grid = document.getElementById('tables-grid');
+    for(let i=1; i<=12; i++) {
+        const d = document.createElement('div');
+        d.className = 'table-chip active'; d.innerText = i;
+        d.onclick = () => {
+            config.diffName = 'Manual';
+            if(config.tables.includes(i)) {
+                if(config.tables.length > 1) { config.tables = config.tables.filter(x => x !== i); d.classList.remove('active'); }
+            } else { config.tables.push(i); d.classList.add('active'); }
+        };
+        grid.appendChild(d);
+    }
+
+    function updateVal(type, val) {
+        config[type] = parseInt(val);
+        config.diffName = 'Manual';
+        document.getElementById(`val-${type}`).innerText = val;
+        document.getElementById(`range-${type}`).value = val;
+    }
+
+    function applyPreset(p) {
+        config.penalty = false;
+        document.getElementById('expert-alert').style.display = 'none';
+        if(p === 'facil') { updateVal('q', 20); updateVal('t', 15); config.diffName = 'Fácil'; }
+        else if(p === 'medio') { updateVal('q', 20); updateVal('t', 12); config.diffName = 'Medio'; }
+        else if(p === 'dificil') { updateVal('q', 20); updateVal('t', 10); config.diffName = 'Difícil'; }
+        else if(p === 'experto') { 
+            updateVal('q', 20); updateVal('t', 7); 
+            config.penalty = true; 
+            config.diffName = 'Experto'; 
+            document.getElementById('expert-alert').style.display = 'block';
+        }
+    }
+
+    function showConfig() { currentMode = '👑'; document.getElementById('mode-screen').classList.add('hidden'); document.getElementById('config-screen').classList.remove('hidden'); }
+    function startMaxi() { currentMode = '⭐'; config = { q: 144, t: 10, tables: [1,2,3,4,5,6,7,8,9,10,11,12], penalty: false, diffName: 'Maxi' }; initGame(); }
+
+    function initGame() {
+        pool = [];
+        let combs = [];
+        config.tables.forEach(a => { for(let b=1; b<=12; b++) combs.push({a, b}); });
+        while(pool.length < config.q) {
+            let batch = [...combs].sort(() => Math.random() - 0.5);
+            for(let q of batch) {
+                if(pool.length >= config.q) break;
+                pool.push(q);
+            }
+        }
+        currentIdx = 0; score = { c:0, w:0, s:0 }; history = []; isPaused = false;
+        document.getElementById('total-num').innerText = pool.length;
+        document.getElementById('mode-screen').classList.add('hidden');
+        document.getElementById('config-screen').classList.add('hidden');
+        document.getElementById('game-screen').classList.remove('hidden');
+        showQ();
+    }
+
+    function showQ() {
+        if(currentIdx >= pool.length) return finish();
+        const q = pool[currentIdx];
+        document.getElementById('current-num').innerText = currentIdx + 1;
+        document.getElementById('question').innerText = `${q.a} × ${q.b}`;
+        const ans = q.a * q.b;
+        let opts = new Set([ans]);
+        while(opts.size < 4) opts.add(Math.floor(Math.random()*144)+1);
+        document.getElementById('options-container').innerHTML = Array.from(opts).sort(()=>Math.random()-0.5).map(o => `<button class="option-btn" onclick="handleSelect(${o})">${o}</button>`).join('');
+        timeLeft = config.t;
+        const bar = document.getElementById('timer-bar');
+        bar.style.transition = 'none'; bar.style.width = '100%';
+        setTimeout(() => { bar.style.transition = `width ${config.t}s linear`; bar.style.width = '0%'; }, 50);
+        clearInterval(timer);
+        timer = setInterval(() => { if(!isPaused) { timeLeft--; if(timeLeft <= 0) handleSelect(null); } }, 1000);
+    }
+
+    function handleSelect(val) {
+        if(isPaused) return;
+        clearInterval(timer);
+        const q = pool[currentIdx];
+        const ans = q.a * q.b;
+        let status = (val === ans) ? "correct" : (val === null ? "skipped" : "wrong");
+        if(status === "correct") score.c++; else if(status === "skipped") score.s++; else score.w++;
+        history.push({ q: `${q.a}×${q.b}`, ans, user: val, status });
+        currentIdx++; showQ();
+    }
+
+    function triggerCancel() {
+        isPaused = true;
+        document.getElementById('timer-bar').style.transition = 'none';
+        document.getElementById('cancel-confirm').classList.remove('hidden');
+        let count = 5;
+        document.getElementById('cancel-timer').innerText = count;
+        cancelInterval = setInterval(() => {
+            count--; document.getElementById('cancel-timer').innerText = count;
+            if(count <= 0) location.reload();
+        }, 1000);
+    }
+
+    function abortCancel() {
+        isPaused = false; clearInterval(cancelInterval);
+        document.getElementById('cancel-confirm').classList.add('hidden');
+        const bar = document.getElementById('timer-bar');
+        bar.style.transition = `width ${timeLeft}s linear`; bar.style.width = '0%';
+    }
+
+    function finish() {
+        let effC = score.c;
+        if(config.penalty) effC = Math.max(0, score.c - Math.floor((score.w + score.s) / 2));
+        let g = ((effC / pool.length) * 6 + 1).toFixed(1);
+        document.getElementById('grade').innerText = g;
+        document.getElementById('res-correct').innerText = score.c;
+        document.getElementById('res-wrong').innerText = score.w;
+        document.getElementById('res-skipped').innerText = score.s;
+        document.getElementById('result-scroll-window').innerHTML = history.map((x, i) => `<div class="review-item rev-${x.status}"><b>${i+1}. ${x.q} = ${x.ans}</b><br>Respuesta: ${x.user === null ? 'Omitida' : x.user}</div>`).join('');
+        document.getElementById('game-screen').classList.add('hidden');
+        document.getElementById('result-screen').classList.remove('hidden');
+    }
+
+    function saveResult() {
+        const name = document.getElementById('player-name-input').value || "Anónimo";
+        const rec = { 
+            name, 
+            grade: document.getElementById('grade').innerText, 
+            stats: { c: score.c, w: score.w, s: score.s }, 
+            tables: config.tables.sort((a,b)=>a-b).join(','),
+            mode: currentMode,
+            diff: config.diffName,
+            history: history
+        };
+        let recs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+        recs.push(rec);
+        recs.sort((a,b) => b.grade - a.grade).splice(10);
+        localStorage.setItem(DB_KEY, JSON.stringify(recs));
+        location.reload();
+    }
+
+    function renderRanking() {
+        const recs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+        document.getElementById('ranking-body').innerHTML = recs.map((r, i) => {
+            const modeColor = r.mode === '👑' ? 'var(--azul)' : '#2d3436';
+            return `
+            <tr onclick="showHist(${i})">
+                <td style="text-align:left; padding-left:10px;">
+                    <b>${r.name}</b><br>
+                    <span style="font-size:9px; color:var(--gris)">Tablas: ${r.tables}</span>
+                </td>
+                <td>
+                    <span class="badge-mode" style="background:${modeColor}">${r.mode} ${r.diff}</span>
+                </td>
+                <td style="font-size:14px"><b>${r.grade}</b></td>
+                <td style="color:var(--gris)">${r.stats.c}/${r.stats.w}/${r.stats.s}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    function showHist(idx) {
+        const recs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
+        const data = recs[idx];
+        if(data && data.history) {
+            document.getElementById('historical-scroll-window').innerHTML = data.history.map((x, i) => `
+                <div class="review-item rev-${x.status}">
+                    <b>${i+1}. ${x.q} = ${x.ans}</b><br>Respuesta: ${x.user === null ? 'Omitida' : x.user}
+                </div>`).join('');
+            document.getElementById('historical-review-area').classList.remove('hidden');
+        }
+    }
+
+    function resetRanking() { if(confirm("¿Borrar historial?")) { localStorage.removeItem(DB_KEY); location.reload(); } }
+    renderRanking();
+</script>
+</body>
+</html>

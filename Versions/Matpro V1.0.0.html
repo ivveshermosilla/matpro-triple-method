@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica de Tablas de Multiplicar</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #quiz-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 400px;
+            text-align: center;
+        }
+        h1 { color: #2c3e50; }
+        .hidden { display: none; }
+        .option-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        .option-btn:hover { background-color: #2980b9; }
+        #timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 15px;
+        }
+        #question { font-size: 32px; margin-bottom: 20px; font-weight: bold; }
+        #start-btn, #restart-btn {
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .stats-list { text-align: left; display: inline-block; font-size: 18px; }
+        #progress { color: #7f8c8d; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="start-screen">
+        <h1>¡Tablas de Multiplicar!</h1>
+        <p>Tablas: 1, 2, 3, 5 y 10</p>
+        <p>15 preguntas | 30 seg por cada una</p>
+        <button id="start-btn">Comenzar Juego</button>
+    </div>
+
+    <div id="game-screen" class="hidden">
+        <div id="progress">Pregunta <span id="current-num">1</span> de 15</div>
+        <div id="timer">Tiempo: 30s</div>
+        <div id="question">? x ?</div>
+        <div id="options">
+            <button class="option-btn" onclick="checkAnswer(this)"></button>
+            <button class="option-btn" onclick="checkAnswer(this)"></button>
+            <button class="option-btn" onclick="checkAnswer(this)"></button>
+            <button class="option-btn" onclick="checkAnswer(this)"></button>
+        </div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+        <h1>Resultados Finales</h1>
+        <h2 id="final-percent" style="font-size: 40px; color: #3498db;">0%</h2>
+        <div class="stats-list">
+            <p>✅ Correctas: <span id="res-correct">0</span></p>
+            <p>❌ Incorrectas: <span id="res-wrong">0</span></p>
+            <p>⚪ Omitidas: <span id="res-skipped">0</span></p>
+        </div>
+        <br><br>
+        <button id="restart-btn" onclick="location.reload()">Volver a intentar</button>
+    </div>
+</div>
+
+<script>
+    const tables = [1, 2, 3, 5, 10];
+    let questions = [];
+    let currentIdx = 0;
+    let correctCount = 0;
+    let wrongCount = 0;
+    let skippedCount = 0;
+    let timeLeft = 30;
+    let timerInterval;
+
+    const startBtn = document.getElementById('start-btn');
+    const startScreen = document.getElementById('start-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const resultScreen = document.getElementById('result-screen');
+
+    startBtn.addEventListener('click', startGame);
+
+    function startGame() {
+        generateQuestions();
+        startScreen.classList.add('hidden');
+        gameScreen.classList.remove('hidden');
+        showQuestion();
+    }
+
+    function generateQuestions() {
+        for (let i = 0; i < 15; i++) {
+            const t = tables[Math.floor(Math.random() * tables.length)];
+            const n = Math.floor(Math.random() * 10) + 1;
+            questions.push({ a: t, b: n, ans: t * n });
+        }
+    }
+
+    function showQuestion() {
+        if (currentIdx >= 15) return endGame();
+        
+        timeLeft = 30;
+        document.getElementById('timer').innerText = `Tiempo: ${timeLeft}s`;
+        document.getElementById('current-num').innerText = currentIdx + 1;
+        
+        const q = questions[currentIdx];
+        document.getElementById('question').innerText = `${q.a} x ${q.b} = ?`;
+        
+        // Generar alternativas
+        let choices = [q.ans];
+        while(choices.length < 4) {
+            let fake = (Math.floor(Math.random() * 10) + 1) * tables[Math.floor(Math.random() * tables.length)];
+            if (!choices.includes(fake)) choices.push(fake);
+        }
+        choices.sort(() => Math.random() - 0.5);
+
+        const buttons = document.querySelectorAll('.option-btn');
+        buttons.forEach((btn, i) => {
+            btn.innerText = choices[i];
+            btn.disabled = false;
+        });
+
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').innerText = `Tiempo: ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                skippedCount++;
+                nextQuestion();
+            }
+        }, 1000);
+    }
+
+    function checkAnswer(btn) {
+        clearInterval(timerInterval);
+        const selected = parseInt(btn.innerText);
+        const correct = questions[currentIdx].ans;
+
+        if (selected === correct) {
+            correctCount++;
+        } else {
+            wrongCount++;
+        }
+        nextQuestion();
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < 15) {
+            showQuestion();
+        } else {
+            endGame();
+        }
+    }
+
+    function endGame() {
+        clearInterval(timerInterval);
+        gameScreen.classList.add('hidden');
+        resultScreen.classList.remove('hidden');
+
+        const total = 15;
+        const percent = Math.round((correctCount / total) * 100);
+        
+        document.getElementById('final-percent').innerText = `${percent}%`;
+        document.getElementById('res-correct').innerText = correctCount;
+        document.getElementById('res-wrong').innerText = wrongCount;
+        document.getElementById('res-skipped').innerText = skippedCount;
+    }
+</script>
+
+</body>
+</html>
