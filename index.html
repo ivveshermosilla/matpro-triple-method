@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tablas Pro 👑 - Versión 41</title>
+    <title>MatPro 👑 - Versión 1.5.0</title>
     <style>
         :root { --azul: #2980b9; --naranja: #e67e22; --rojo: #e74c3c; --verde: #27ae60; --gris: #7f8c8d; --fondo: #2c3e50; --purpura: #8e44ad; --dorado: #f1c40f; }
         body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--fondo); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: white; overflow: hidden; }
@@ -45,14 +45,14 @@
     <button id="lang-toggle-btn" class="hidden" onclick="toggleLang()">🌐 ES / EN</button>
 
     <div id="init-lang-screen">
-        <h1 style="margin-bottom:20px;">Tablas Pro 👑</h1>
+        <h1 style="margin-bottom:20px;">MatPro 👑</h1>
         <p style="font-weight:bold; color:var(--gris); margin-bottom:20px;">Selecciona tu idioma / Select Language</p>
         <button class="mode-btn btn-pro" onclick="setInitialLang('es')">🇪🇸 Español</button>
         <button class="mode-btn btn-pro" onclick="setInitialLang('en')" style="background:#34495e">🇺🇸 English</button>
     </div>
 
     <div id="mode-screen" class="hidden">
-        <h1 id="txt-title" style="margin:0 0 10px 0;">Tablas Pro 👑</h1>
+        <h1 id="txt-title" style="margin:0 0 10px 0;">MatPro 👑</h1>
         <button id="txt-btn-practice" class="mode-btn btn-pro" onclick="showConfig()">Practica las tablas 👑</button>
         <button id="txt-btn-maxi" class="mode-btn btn-maxi" onclick="startMaxi()">Maxitablas Pro ⭐</button>
         <div style="margin-top: 15px;">
@@ -122,7 +122,7 @@
 <script>
     const i18n = {
         es: {
-            title: "Tablas Pro 👑", practice: "Practica las tablas 👑", maxi: "Maxitablas Pro ⭐", ranking: "🏆 TOP 10 RÁNKING",
+            title: "MatPro 👑", practice: "Practica las tablas 👑", maxi: "Maxitablas Pro ⭐", ranking: "🏆 TOP 10 RÁNKING",
             thP: "Jugador", thM: "Modo", thG: "Calif.", thT: "⏱️", thS: "✅/❌/⚪", reset: "Resetear Scoreboard",
             rev: "Revisión:", config: "Configuración", easy: "FÁCIL", med: "MEDIO", hard: "DIFÍCIL", exp: "EXPERTO",
             expAlert: "⚠️ MODO EXPERTO: Se descuenta 1 respuesta correcta por cada 2 incorrectas.",
@@ -365,4 +365,5 @@
     function resetRanking() { if(confirm(curLang === 'es' ? "¿Borrar historial?" : "Reset Ranking?")) { localStorage.removeItem(DB_KEY); location.reload(); } }
 </script>
 </body>
+
 </html>
