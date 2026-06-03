@@ -43,6 +43,13 @@ function updateTexts() {
   setText("txt-stat-maxi-label", t.statMaxiLabel);
   setText("txt-method-title", t.methodTitle);
   setText("txt-method-copy", t.methodCopy);
+  setText("txt-quick-title", t.quickTitle);
+  setText("txt-quick-subtitle", t.quickSubtitle);
+  setText("txt-quick-chip", t.quickChip);
+  setText("txt-quick-label", t.quickLabel);
+  setPlaceholder("quick-answer-input", t.quickPh);
+  setText("txt-quick-check", t.quickCheck);
+  setText("txt-quick-next", t.quickNext);
   setText("txt-tutor-eyebrow", t.tutorEyebrow);
   setText("txt-tutor-title", t.tutorTitle);
   setText("txt-tutor-copy", t.tutorCopy);
@@ -137,6 +144,7 @@ function updateTexts() {
   updateConfigStats();
   updateModeLabels();
   updateStartState();
+  renderQuickPracticeFeedback();
 }
 
 function updateLanguageSwitch() {

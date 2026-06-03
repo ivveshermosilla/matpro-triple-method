@@ -63,6 +63,27 @@
       </article>
 
       <div class="home-side">
+        <aside class="panel active-practice-panel" aria-labelledby="txt-quick-title">
+          <div class="active-practice-head">
+            <div>
+              <h2 id="txt-quick-title">Práctica activa</h2>
+              <p id="txt-quick-subtitle">Multiplicación aleatoria cada vez que cargas la página.</p>
+            </div>
+            <span id="txt-quick-chip" class="pill">Aleatoria</span>
+          </div>
+
+          <div class="quick-practice-card">
+            <div id="txt-quick-label" class="section-label">Multiplicación rápida</div>
+            <div id="quick-question" class="quick-practice-problem">7 × 8</div>
+            <div class="quick-practice-dock">
+              <input id="quick-answer-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Tu respuesta" />
+              <button id="txt-quick-check" class="btn btn-primary" type="button">OK</button>
+            </div>
+            <div id="quick-feedback" class="quick-feedback" aria-live="polite"></div>
+            <button id="txt-quick-next" class="btn btn-secondary" type="button">Otra multiplicación</button>
+          </div>
+        </aside>
+
         <aside class="panel ranking-panel" aria-labelledby="txt-ranking-title">
           <div class="card-header">
             <div>
@@ -311,6 +332,7 @@
   <script src="assets/js/config.js"></script>
   <script src="assets/js/game.js"></script>
   <script src="assets/js/ranking.js"></script>
+  <script src="assets/js/quick-practice.js"></script>
   <script src="assets/js/events.js"></script>
   <script src="assets/js/app.js"></script>
 

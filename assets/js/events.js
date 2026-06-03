@@ -12,6 +12,11 @@ function initEventHandlers() {
   $("txt-footer-about").addEventListener("click", () => openModal("about-modal"));
   $("txt-about-close").addEventListener("click", () => closeModal("about-modal"));
   $("txt-reset-ranking").addEventListener("click", resetRanking);
+  $("txt-quick-check").addEventListener("click", checkQuickPractice);
+  $("txt-quick-next").addEventListener("click", nextQuickPractice);
+  $("quick-answer-input").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") checkQuickPractice();
+  });
 
   $$("[data-preset]").forEach(button => {
     button.addEventListener("click", () => applyPreset(button.dataset.preset));

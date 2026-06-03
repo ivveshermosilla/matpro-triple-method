@@ -2,7 +2,7 @@
 
 ## Overview
 
-MatPro v1.6.2 is a vanilla HTML/CSS/JavaScript web app published through GitHub Pages. The app helps students practice multiplication tables with a bilingual ES/EN interface, configurable smart practice, tutor guidance, local session history, and focused error review.
+MatPro v1.6.3 is a vanilla HTML/CSS/JavaScript web app published through GitHub Pages. The app helps students practice multiplication tables with a bilingual ES/EN interface, active recall warmup, configurable smart practice, tutor guidance, local session history, and focused error review.
 
 Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 
@@ -25,6 +25,7 @@ Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 | `assets/js/config.js` | Difficulty presets, sliders, table selector, select-all/deselect-all behavior, question limit validation, saved configuration, no-timer mode, and Maxitablas setup. |
 | `assets/js/game.js` | Smart practice: unique question pool, smart distractors, optional timer, scoring, pause/quit flow, final grades, and error review rendering. |
 | `assets/js/ranking.js` | Local history for the 10 most recent saved sessions, per-session configuration snapshots, historical review, and reset behavior. |
+| `assets/js/quick-practice.js` | Active practice warmup with a random multiplication, typed answer, and bilingual feedback. |
 | `assets/js/events.js` | Centralized DOM event wiring for clicks, sliders, table chips, answer options, ranking history, and modals. |
 | `assets/js/app.js` | Boot sequence. Initializes events, saved config, table chips, text rendering, presets, and mode labels. |
 | `assets/printables/matpro-grid-es.html` | Spanish printable source for the Triple Method blank 12x12 grid sheet. |
@@ -39,7 +40,7 @@ Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 ## Screens
 
 - `init-lang-screen`: first-use language choice with the same EN/ES switch style used across the site.
-- `mode-screen`: player-focused home dashboard with hero copy, practice buttons, recent-session history, GitHub link, DivisionPro placeholder, and about-project action.
+- `mode-screen`: player-focused home dashboard with hero copy, practice buttons, active practice warmup, recent-session history, GitHub link, DivisionPro placeholder, and about-project action.
 - `config-screen`: practice configuration with difficulty presets, smart-practice explanation, question/time sliders, and table selection.
 - `game-screen`: smart practice with four option buttons, optional visual timer, live score, live review strip, and quit confirmation.
 - `result-screen`: final grade, USA letter grade, Chilean numeric grade, stats, error review, and save controls.
@@ -49,6 +50,7 @@ Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 ## Practice Modes
 
 - Practice Tables: user chooses active tables, difficulty, number of questions, and seconds per question. Setting time to `0` creates an untimed round.
+- Active Practice: home warmup that asks one random 1x1 through 12x12 multiplication, accepts a typed answer, and gives immediate feedback without affecting saved history.
 - Smart Practice: game with four answer options. Distractors are generated from adjacent table values, plus/minus one errors, and reversed-digit patterns when possible.
 - Maxitablas Pro: automatic 144-question session covering every multiplication from 1x1 through 12x12.
 - Expert preset: deducts one effective correct answer for every two wrong answers.

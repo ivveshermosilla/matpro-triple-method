@@ -18,6 +18,7 @@ let isPaused = false;
 let startTime = 0;
 let totalTimeSeconds = 0;
 let customConfigSnapshot = null;
+let quickPractice = { a: 7, b: 8, feedback: "", user: null };
 
 const $ = (id) => document.getElementById(id);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));

@@ -5,3 +5,4 @@ initTablesGrid();
 updateTexts();
 updatePresetButtons(getPresetFromDiff(config.diffName));
 updateModeLabels();
+nextQuickPractice();

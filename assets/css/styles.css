@@ -403,6 +403,85 @@ button:focus-visible, input:focus-visible {
   margin-bottom: 5px;
 }
 
+.active-practice-panel {
+  padding: 24px;
+}
+
+.active-practice-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.active-practice-head h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 4vw, 2.1rem);
+  letter-spacing: 0;
+}
+
+.active-practice-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.quick-practice-card {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff, #f8fbff);
+}
+
+.quick-practice-problem {
+  margin: 18px 0 20px;
+  text-align: center;
+  color: var(--brand-strong);
+  font-size: clamp(56px, 12vw, 86px);
+  line-height: .95;
+  font-weight: 1000;
+  letter-spacing: 0;
+}
+
+.quick-practice-dock {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.quick-feedback {
+  min-height: 44px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  font-weight: 900;
+  line-height: 1.4;
+}
+
+.quick-feedback:empty {
+  display: none;
+}
+
+.quick-feedback.correct {
+  color: #166534;
+  border-color: rgba(22, 163, 74, .24);
+  background: rgba(22, 163, 74, .10);
+}
+
+.quick-feedback.wrong {
+  color: #991b1b;
+  border-color: rgba(239, 68, 68, .24);
+  background: rgba(239, 68, 68, .10);
+}
+
+.quick-feedback.empty {
+  color: #92400e;
+  border-color: rgba(245, 158, 11, .26);
+  background: rgba(245, 158, 11, .12);
+}
+
 .card-header {
   display: flex;
   align-items: flex-start;
@@ -757,6 +836,7 @@ input[type="range"] {
   color: var(--brand-strong);
 }
 
+#quick-answer-input,
 #player-name-input {
   width: 100%;
   min-height: 56px;
@@ -767,6 +847,11 @@ input[type="range"] {
   background: #f8fafc;
   font-weight: 900;
   font-size: 1.08rem;
+}
+
+#quick-answer-input {
+  text-align: center;
+  font-size: 1.4rem;
 }
 
 .choice-grid {
@@ -1195,6 +1280,10 @@ input[type="range"] {
 
   .hero-actions {
     display: grid;
+  }
+
+  .quick-practice-dock {
+    grid-template-columns: 1fr;
   }
 
   .card-header {
