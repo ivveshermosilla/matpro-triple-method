@@ -1,4 +1,4 @@
-// MatPro v1.6.0 - navigation
+// MatPro v1.6.1 - navigation
 function showScreen(id) {
   screenIds.forEach(screenId => $(screenId).classList.add("hidden"));
   $(id).classList.remove("hidden");
@@ -24,6 +24,7 @@ function updateTexts() {
   document.documentElement.lang = curLang;
   setText("txt-nav-subtitle", t.navSubtitle);
   updateLanguageSwitch();
+  setText("txt-btn-tutor-guide", t.tutorGuideBtn);
   setText("txt-lang-eyebrow", t.langEyebrow);
   setText("txt-lang-title", t.langTitle);
   setText("txt-lang-subtitle", t.langSubtitle);
@@ -34,18 +35,43 @@ function updateTexts() {
   setText("txt-home-copy", t.homeCopy);
   setText("txt-btn-practice", t.practice);
   setText("txt-btn-maxi", t.maxi);
-  setText("txt-stat-questions-label", t.statQuestions);
-  setText("txt-stat-time-label", t.statTime);
-  setText("txt-stat-method-label", t.statMethod);
+  setText("txt-stat-practice-value", t.statPracticeValue);
+  setText("txt-stat-practice-label", t.statPracticeLabel);
+  setText("txt-stat-timer-value", t.statTimerValue);
+  setText("txt-stat-timer-label", t.statTimerLabel);
+  setText("txt-stat-maxi-value", t.statMaxiValue);
+  setText("txt-stat-maxi-label", t.statMaxiLabel);
   setText("txt-method-title", t.methodTitle);
   setText("txt-method-copy", t.methodCopy);
-  setText("txt-quick-title", t.quickTitle);
-  setText("txt-quick-subtitle", t.quickSubtitle);
-  setText("txt-quick-chip", t.quickChip);
-  setText("txt-quick-label", t.quickLabel);
-  setPlaceholder("quick-answer-input", t.quickPh);
-  setText("txt-quick-check", t.quickCheck);
-  setText("txt-quick-next", t.quickNext);
+  setText("txt-tutor-eyebrow", t.tutorEyebrow);
+  setText("txt-tutor-title", t.tutorTitle);
+  setText("txt-tutor-copy", t.tutorCopy);
+  setText("txt-tutor-grid", t.tutorGrid);
+  $("txt-tutor-grid").href = t.tutorGridHref;
+  setText("txt-tutor-methodology", t.tutorMethodology);
+  setText("txt-tutor-close", t.tutorClose);
+  $("txt-tutor-close").setAttribute("aria-label", t.tutorClose);
+  setText("txt-tutor-principles-title", t.tutorPrinciplesTitle);
+  setText("txt-tutor-principle-1-title", t.tutorPrinciple1Title);
+  setText("txt-tutor-principle-1-copy", t.tutorPrinciple1Copy);
+  setText("txt-tutor-principle-2-title", t.tutorPrinciple2Title);
+  setText("txt-tutor-principle-2-copy", t.tutorPrinciple2Copy);
+  setText("txt-tutor-principle-3-title", t.tutorPrinciple3Title);
+  setText("txt-tutor-principle-3-copy", t.tutorPrinciple3Copy);
+  setText("txt-tutor-sequence-title", t.tutorSequenceTitle);
+  setText("txt-tutor-step-1-title", t.tutorStep1Title);
+  setText("txt-tutor-step-1-copy", t.tutorStep1Copy);
+  setText("txt-tutor-step-2-title", t.tutorStep2Title);
+  setText("txt-tutor-step-2-copy", t.tutorStep2Copy);
+  setText("txt-tutor-step-3-title", t.tutorStep3Title);
+  setText("txt-tutor-step-3-copy", t.tutorStep3Copy);
+  setText("txt-tutor-play-title", t.tutorPlayTitle);
+  setText("txt-tutor-play-1-title", t.tutorPlay1Title);
+  setText("txt-tutor-play-1-copy", t.tutorPlay1Copy);
+  setText("txt-tutor-play-2-title", t.tutorPlay2Title);
+  setText("txt-tutor-play-2-copy", t.tutorPlay2Copy);
+  setText("txt-tutor-play-3-title", t.tutorPlay3Title);
+  setText("txt-tutor-play-3-copy", t.tutorPlay3Copy);
   setText("txt-ranking-title", t.ranking);
   setText("txt-ranking-hint", t.rankingHint);
   setText("txt-ranking-pill", t.scoreboard);
@@ -81,6 +107,9 @@ function updateTexts() {
   setText("txt-btn-quit", t.quit);
   setText("txt-game-q", t.gameQ);
   setText("txt-timer-label", t.timer);
+  if (!$("game-screen").classList.contains("hidden")) {
+    setText("timer-value", config.t === 0 ? t.noTimer : `${Math.max(0, timeLeft)}s`);
+  }
   setText("txt-res-title", t.resT);
   setText("txt-res-save-hint", t.resSaveHint);
   setText("txt-res-ring-label", t.resRing);
@@ -96,10 +125,18 @@ function updateTexts() {
   setText("txt-btn-exit", t.exit);
   setText("txt-footer-github", t.footerGithub);
   setText("txt-footer-division", t.footerDivision);
+  setText("txt-footer-about", t.footerAbout);
+  setText("txt-about-eyebrow", t.aboutEyebrow);
+  setText("txt-about-title", t.aboutTitle);
+  setText("txt-about-close", t.aboutClose);
+  $("txt-about-close").setAttribute("aria-label", t.aboutClose);
+  setText("txt-about-copy-1", t.aboutCopy1);
+  setText("txt-about-copy-2", t.aboutCopy2);
+  setText("txt-about-copy-3", t.aboutCopy3);
+  setText("txt-about-dedication", t.aboutDedication);
   updateConfigStats();
   updateModeLabels();
   updateStartState();
-  renderQuickPracticeFeedback();
 }
 
 function updateLanguageSwitch() {
@@ -119,4 +156,21 @@ function backHome() {
   $("cancel-confirm").classList.add("hidden");
   renderRanking();
   showScreen("mode-screen");
+}
+
+function openModal(id) {
+  $(id).classList.remove("hidden");
+  document.body.classList.add("modal-open");
+}
+
+function closeModal(id) {
+  $(id).classList.add("hidden");
+  if ($$(".modal-overlay:not(.hidden)").length === 0) {
+    document.body.classList.remove("modal-open");
+  }
+}
+
+function closeAllModals() {
+  $$(".modal-overlay").forEach(modal => modal.classList.add("hidden"));
+  document.body.classList.remove("modal-open");
 }

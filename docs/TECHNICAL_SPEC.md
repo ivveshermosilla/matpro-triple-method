@@ -2,7 +2,7 @@
 
 ## Overview
 
-MatPro v1.6.0 is a vanilla HTML/CSS/JavaScript web app published through GitHub Pages. The app helps students practice multiplication tables with a bilingual ES/EN interface, a quick active-practice warmup, timed smart practice, local ranking, and focused error review.
+MatPro v1.6.1 is a vanilla HTML/CSS/JavaScript web app published through GitHub Pages. The app helps students practice multiplication tables with a bilingual ES/EN interface, configurable smart practice, tutor guidance, local ranking, and focused error review.
 
 Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 
@@ -22,12 +22,15 @@ Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 | `assets/js/state.js` | Shared state, constants, DOM helpers, text escaping, and persistence key. |
 | `assets/js/i18n.js` | Spanish and English dictionaries for every visible UI string. |
 | `assets/js/navigation.js` | Screen switching, initial language selection, live language updates, and translated UI rendering. |
-| `assets/js/config.js` | Difficulty presets, sliders, table selector, select-all/deselect-all behavior, start-button validation, and Maxitablas setup. |
-| `assets/js/quick-practice.js` | Untimed active-practice warmup with a random multiplication, typed answer, and bilingual feedback. |
-| `assets/js/game.js` | Timed smart practice: question pool, smart distractors, timer, scoring, pause/quit flow, final grades, and error review rendering. |
+| `assets/js/config.js` | Difficulty presets, sliders, table selector, select-all/deselect-all behavior, question limit validation, saved configuration, no-timer mode, and Maxitablas setup. |
+| `assets/js/game.js` | Smart practice: unique question pool, smart distractors, optional timer, scoring, pause/quit flow, final grades, and error review rendering. |
 | `assets/js/ranking.js` | Top 10 local scoreboard, saved-record sorting, historical review, and reset behavior. |
-| `assets/js/events.js` | Centralized DOM event wiring for clicks, sliders, keyboard Enter, table chips, answer options, and ranking history. |
-| `assets/js/app.js` | Boot sequence. Initializes events, table chips, quick practice, text rendering, presets, and mode labels. |
+| `assets/js/events.js` | Centralized DOM event wiring for clicks, sliders, table chips, answer options, ranking history, and modals. |
+| `assets/js/app.js` | Boot sequence. Initializes events, saved config, table chips, text rendering, presets, and mode labels. |
+| `assets/printables/matpro-grid-es.html` | Spanish printable source for the Triple Method blank 12x12 grid sheet. |
+| `assets/printables/matpro-grid-es.pdf` | Spanish one-page letter landscape printable grid. |
+| `assets/printables/matpro-grid-en.html` | English printable source for the Triple Method blank 12x12 grid sheet. |
+| `assets/printables/matpro-grid-en.pdf` | English one-page letter landscape printable grid. |
 | `docs/TECHNICAL_SPEC.md` | This technical reference for maintenance and future upgrades. |
 | `README.md` | Human story, project intent, live link, and high-level feature summary. |
 | `changelog.md` | Historical version log. |
@@ -36,17 +39,18 @@ Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 ## Screens
 
 - `init-lang-screen`: first-use language choice with the same EN/ES switch style used across the site.
-- `mode-screen`: home dashboard with hero copy, active-practice warmup, ranking, GitHub link, and DivisionPro placeholder.
+- `mode-screen`: player-focused home dashboard with hero copy, practice buttons, ranking, GitHub link, DivisionPro placeholder, and about-project action.
 - `config-screen`: practice configuration with difficulty presets, smart-practice explanation, question/time sliders, and table selection.
-- `game-screen`: timed smart practice with four option buttons, visual timer, live score, live review strip, and quit confirmation.
+- `game-screen`: smart practice with four option buttons, optional visual timer, live score, live review strip, and quit confirmation.
 - `result-screen`: final grade, USA letter grade, Chilean numeric grade, stats, error review, and save controls.
+- `tutor-guide-modal`: global tutor guide with Triple Method principles, how to play, downloadable language-specific grid, and full methodology link.
+- `about-modal`: global project context based on the README story and dedication.
 
 ## Practice Modes
 
-- Active Practice: untimed written recall on the home screen. It asks a random multiplication from 1x1 through 12x12 on load and when "Another multiplication" is pressed.
-- Smart Practice: timed game with four answer options. Distractors are generated from adjacent table values, plus/minus one errors, and reversed-digit patterns when possible.
-- Custom Practice: user chooses number of questions, seconds per question, and active tables.
-- Maxitablas Pro: automatic 144-question session covering all 12 tables.
+- Practice Tables: user chooses active tables, difficulty, number of questions, and seconds per question. Setting time to `0` creates an untimed round.
+- Smart Practice: game with four answer options. Distractors are generated from adjacent table values, plus/minus one errors, and reversed-digit patterns when possible.
+- Maxitablas Pro: automatic 144-question session covering every multiplication from 1x1 through 12x12.
 - Expert preset: deducts one effective correct answer for every two wrong answers.
 
 ## Table Selection Rules
@@ -54,6 +58,7 @@ Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 - Tables 1 through 12 can be toggled individually.
 - "Select all" activates all tables.
 - "Deselect all" clears every table.
+- The question slider max is always `selectedTables * 12`, so rounds cannot ask more questions than the selected unique combinations.
 - The start button is disabled while no table is selected, and a bilingual warning is shown.
 
 ## Scoring
@@ -65,9 +70,11 @@ Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 
 ## Persistence
 
-Records are stored locally on the current device only.
+Records and the player's last practice configuration are stored locally on the current device only.
 
-Storage key: `tablas_pro_universal_records`
+Scoreboard key: `tablas_pro_universal_records`
+
+Configuration key: `matpro_player_config_v1`
 
 Saved record shape:
 
@@ -93,7 +100,7 @@ Saved record shape:
 - The active language is held in `curLang`.
 - All visible copy lives in `assets/js/i18n.js`.
 - `updateTexts()` in `assets/js/navigation.js` applies translations to the DOM.
-- The language switch updates labels, placeholders, ranking messages, review messages, ARIA text, and saved-record display labels.
+- The language switch updates labels, placeholders, ranking messages, review messages, ARIA text, saved-record display labels, and the tutor grid download target.
 
 ## Responsive And Accessibility Notes
 
@@ -101,8 +108,6 @@ Saved record shape:
 - Major breakpoints are handled in `assets/css/styles.css` with mobile layouts at `max-width: 960px` and `max-width: 680px`.
 - Buttons use touch-friendly sizes and `type="button"` to avoid accidental form behavior.
 - Table chips and language buttons use `aria-pressed`.
-- Quick-practice feedback uses `aria-live="polite"`.
-- Numeric inputs use `inputmode="numeric"` for mobile keyboards.
 - Focus states are visible for keyboard navigation.
 
 ## Maintenance Rules

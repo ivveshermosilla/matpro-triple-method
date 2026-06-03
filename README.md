@@ -18,7 +18,8 @@ The digital component of this project evolved across 51+ iterations into a robus
 * **📊 Dual Grading System**: Performance evaluation tailored for both **USA (A-F)** and **Chile (1.0-7.0)** standards.
 * **🌎 Multilingual Support**: Full UI internationalization (i18n) to switch seamlessly between English and Spanish.
 * **📈 Historical Error Review**: Filters and exclusively displays mistakes and skipped questions for clean, focused learning reinforcement.
-* **✍️ Active Practice Warmup**: A quick untimed written-recall card asks a random multiplication before the timed game.
+* **🧭 Tutor Guide + Printables**: Includes the Triple Method guidance and printable 12x12 grids for English and Spanish.
+* **⏱️ Optional Timer**: Practice rounds can be timed or untimed by setting the timer to 0.
 * **📱 Responsive Modern UI**: Built to remain usable on desktop, iPad/tablets, iPhone, and Android phones.
 
 ## 🧠 The Triple Method (Overview)
@@ -26,6 +27,8 @@ The digital component of this project evolved across 51+ iterations into a robus
 1. **Grid Method (Visual/Auditory/Mechanical)**: Completing a physical 12x12 multiplication grid while reading operations aloud, utilizing a fidget tool in the non-dominant hand.
 2. **Object Toss Method (Kinesthetic)**: Active memory recall while throwing and catching a soft object (like a NeeDoh Fuzz Ball).
 3. **Matpro Web App (Interactive)**: Gamified digital reinforcement to transform repetition into play.
+
+Full guide: [`METHODOLOGY.md`](METHODOLOGY.md) · Printable grids: [English](assets/printables/matpro-grid-en.pdf) / [Spanish](assets/printables/matpro-grid-es.pdf)
 
 ## 🛠️ Technical Overview
 * **Logic**: Modular vanilla JavaScript with custom arrays and algorithms for smart distractors and scoring.

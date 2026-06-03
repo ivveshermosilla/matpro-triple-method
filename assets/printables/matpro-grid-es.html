@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MatPro - Grid 12x12 imprimible</title>
+  <style>
+    :root {
+      --ink: #162033;
+      --muted: #64748b;
+      --line: #cbd5e1;
+      --soft: #f8fafc;
+      --brand: #2563eb;
+      --mint: #14b8a6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: white;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .sheet {
+      width: min(100%, 10.4in);
+      margin: 0 auto;
+      padding: .35in;
+    }
+
+    .header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: .2in;
+      align-items: end;
+      margin-bottom: .18in;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22pt;
+      line-height: 1;
+    }
+
+    .subtitle {
+      margin: .06in 0 0;
+      color: var(--muted);
+      font-size: 9.5pt;
+      line-height: 1.35;
+    }
+
+    .brand {
+      display: inline-grid;
+      place-items: center;
+      width: .55in;
+      height: .55in;
+      border-radius: .16in;
+      color: white;
+      background: linear-gradient(135deg, var(--brand), var(--mint));
+      font-weight: 900;
+      font-size: 14pt;
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr .8fr;
+      gap: .12in;
+      margin-bottom: .16in;
+    }
+
+    .field {
+      min-height: .34in;
+      border: 1px solid var(--line);
+      border-radius: .08in;
+      padding: .08in .1in;
+      color: var(--muted);
+      font-size: 8.6pt;
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th,
+    td {
+      height: .43in;
+      border: 1px solid var(--line);
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    th {
+      background: var(--soft);
+      font-size: 9pt;
+      font-weight: 900;
+    }
+
+    .axis {
+      color: white;
+      background: var(--brand);
+      border-color: var(--brand);
+    }
+
+    .notes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .12in;
+      margin-top: .16in;
+    }
+
+    .note {
+      min-height: .56in;
+      border: 1px solid var(--line);
+      border-radius: .1in;
+      padding: .1in;
+      background: var(--soft);
+      font-size: 8pt;
+      line-height: 1.35;
+    }
+
+    .note strong {
+      display: block;
+      margin-bottom: .03in;
+      color: var(--ink);
+      font-size: 8.5pt;
+    }
+
+    .footer {
+      margin-top: .12in;
+      color: var(--muted);
+      font-size: 7.8pt;
+      text-align: center;
+    }
+
+    @page {
+      size: letter landscape;
+      margin: .25in;
+    }
+
+    @media print {
+      .sheet {
+        width: 100%;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="sheet">
+    <header class="header">
+      <div>
+        <h1>MatPro - Grid 12x12 imprimible</h1>
+        <p class="subtitle">Hoja para practicar el Grid Method. Completa el grid mientras dices cada operación en voz alta.</p>
+      </div>
+      <div class="brand" aria-label="MatPro">M×</div>
+    </header>
+
+    <section class="meta" aria-label="Datos de práctica">
+      <div class="field">Nombre:</div>
+      <div class="field">Tabla foco:</div>
+      <div class="field">Fecha:</div>
+    </section>
+
+    <table id="grid" aria-label="Grid vacío de multiplicación 12 por 12"></table>
+
+    <section class="notes" aria-label="Recordatorios del Grid Method">
+      <div class="note">
+        <strong>1. Dilo en voz alta</strong>
+        Di la operación completa mientras escribes la respuesta.
+      </div>
+      <div class="note">
+        <strong>2. Mantén un solo orden</strong>
+        Usa siempre fila x columna o columna x fila para crear estructura.
+      </div>
+      <div class="note">
+        <strong>3. Sesión corta</strong>
+        Practica máximo 20 minutos y luego toma 15 minutos de pausa física.
+      </div>
+    </section>
+
+    <p class="footer">MatPro Triple Method · Práctica humana de multiplicaciones · github.com/ivveshermosilla/matpro-triple-method</p>
+  </main>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const header = ["×", ...Array.from({ length: 12 }, (_, index) => index + 1)];
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+    header.forEach((value, index) => {
+      const th = document.createElement("th");
+      th.textContent = value;
+      if (index === 0) th.className = "axis";
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    grid.appendChild(thead);
+
+    const tbody = document.createElement("tbody");
+    for (let row = 1; row <= 12; row++) {
+      const tr = document.createElement("tr");
+      const th = document.createElement("th");
+      th.textContent = row;
+      tr.appendChild(th);
+      for (let col = 1; col <= 12; col++) tr.appendChild(document.createElement("td"));
+      tbody.appendChild(tr);
+    }
+    grid.appendChild(tbody);
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MatPro - Triple Method</title>
-  <meta name="description" content="MatPro Triple Method: practica tablas de multiplicar con una experiencia moderna, bilingue y ADHD-friendly." />
+  <meta name="description" content="MatPro Triple Method: practica tablas de multiplicar con una experiencia moderna, bilingüe y ADHD-friendly." />
   <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
@@ -19,6 +19,7 @@
       </div>
 
       <div class="top-actions">
+        <button id="txt-btn-tutor-guide" class="top-link-btn" type="button">Guía del tutor</button>
         <div id="lang-toggle-btn" class="lang-switch" role="group" aria-label="Cambiar idioma">
           <button id="lang-en-btn" type="button">EN</button>
           <button id="lang-es-btn" type="button">ES</button>
@@ -50,39 +51,18 @@
 
         <div>
           <div class="mini-stats" aria-label="Resumen">
-            <div class="mini-stat"><strong id="stat-q">20</strong><span id="txt-stat-questions-label">preguntas</span></div>
-            <div class="mini-stat"><strong id="stat-t">15s</strong><span id="txt-stat-time-label">por pregunta</span></div>
-            <div class="mini-stat"><strong>12×12</strong><span id="txt-stat-method-label">Triple Method</span></div>
+            <div class="mini-stat"><strong id="txt-stat-practice-value">Configura</strong><span id="txt-stat-practice-label">tablas, preguntas y dificultad</span></div>
+            <div class="mini-stat"><strong id="txt-stat-timer-value">0-30s</strong><span id="txt-stat-timer-label">con o sin temporizador</span></div>
+            <div class="mini-stat"><strong id="txt-stat-maxi-value">Maxi 12×12</strong><span id="txt-stat-maxi-label">144 multiplicaciones</span></div>
           </div>
           <div class="method-note">
-            <strong id="txt-method-title">Práctica activa</strong>
-            <span id="txt-method-copy">Respuesta escrita sin temporizador para reforzar recuerdo real antes de entrar al juego inteligente.</span>
+            <strong id="txt-method-title">Dos caminos de práctica</strong>
+            <span id="txt-method-copy">Practica las tablas permite elegir tablas, dificultad, cantidad de preguntas y temporizador. Maxitablas Pro recorre todo desde 1×1 hasta 12×12.</span>
           </div>
         </div>
       </article>
 
       <div class="home-side">
-        <aside class="panel active-practice-panel" aria-labelledby="txt-quick-title">
-          <div class="active-practice-head">
-            <div>
-              <h2 id="txt-quick-title">Práctica activa</h2>
-              <p id="txt-quick-subtitle">Multiplicación aleatoria cada vez que cargas la página.</p>
-            </div>
-            <span id="txt-quick-chip" class="pill">Aleatoria</span>
-          </div>
-
-          <div class="quick-practice-card">
-            <div id="txt-quick-label" class="section-label">Multiplicación rápida</div>
-            <div id="quick-question" class="quick-practice-problem">7 × 8</div>
-            <div class="quick-practice-dock">
-              <input id="quick-answer-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Tu respuesta" />
-              <button id="txt-quick-check" class="btn btn-primary" type="button">OK</button>
-            </div>
-            <div id="quick-feedback" class="quick-feedback" aria-live="polite"></div>
-            <button id="txt-quick-next" class="btn btn-secondary" type="button">Otra multiplicación</button>
-          </div>
-        </aside>
-
         <aside class="panel ranking-panel" aria-labelledby="txt-ranking-title">
           <div class="card-header">
             <div>
@@ -140,11 +120,12 @@
           <div class="sliders">
             <div class="field">
               <label for="range-q"><span id="txt-label-q">Número de preguntas</span><strong id="val-q">20</strong></label>
-              <input type="range" id="range-q" min="1" max="100" value="20" />
+              <input type="range" id="range-q" min="1" max="144" value="20" />
+              <small id="txt-question-limit" class="field-hint">Máximo según tablas seleccionadas: 144</small>
             </div>
             <div class="field">
-              <label for="range-t"><span id="txt-label-t">Tiempo por pregunta</span><strong><span id="val-t">15</span>s</strong></label>
-              <input type="range" id="range-t" min="1" max="30" value="15" />
+              <label for="range-t"><span id="txt-label-t">Tiempo por pregunta</span><strong id="val-t">15s</strong></label>
+              <input type="range" id="range-t" min="0" max="30" value="15" />
             </div>
           </div>
 
@@ -202,7 +183,7 @@
           <button id="txt-btn-quit" class="btn btn-danger" type="button">Abandonar</button>
           <div class="game-meta">
             <strong><span id="txt-game-q">Pregunta</span> <span id="current-num">1</span> / <span id="total-num">20</span></strong>
-            <span id="txt-game-mode">Práctica activa</span>
+            <span id="txt-game-mode">Práctica inteligente</span>
           </div>
           <div id="live-score-chip" class="pill">0 / 0 / 0</div>
         </div>
@@ -258,9 +239,69 @@
       </article>
     </section>
 
+    <section id="tutor-guide-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="txt-tutor-title">
+      <div class="modal-card tutor-card">
+        <div class="modal-head">
+          <div>
+            <span id="txt-tutor-eyebrow" class="eyebrow">Información para el tutor</span>
+            <h2 id="txt-tutor-title">Guía para el tutor</h2>
+            <p id="txt-tutor-copy">El Triple Method combina memoria visual, movimiento, pausas estructuradas y práctica digital para reducir frustración y construir confianza.</p>
+          </div>
+          <button id="txt-tutor-close" class="modal-close" type="button" aria-label="Cerrar">Cerrar</button>
+        </div>
+
+        <div class="guide-actions">
+          <a id="txt-tutor-grid" class="btn btn-primary" href="assets/printables/matpro-grid-es.pdf" target="_blank" rel="noopener">Descargar grid 12×12</a>
+          <a id="txt-tutor-methodology" class="btn btn-secondary" href="https://github.com/ivveshermosilla/matpro-triple-method/blob/main/METHODOLOGY.md" target="_blank" rel="noopener">Ver metodología completa en GitHub</a>
+        </div>
+
+        <div class="guide-grid">
+          <section class="guide-section">
+            <h3 id="txt-tutor-principles-title">Principios base</h3>
+            <div class="guide-card"><span>01</span><strong id="txt-tutor-principle-1-title">Regla 20/15</strong><p id="txt-tutor-principle-1-copy">Sesiones de máximo 20 minutos, seguidas por 15 minutos de pausa física.</p></div>
+            <div class="guide-card"><span>02</span><strong id="txt-tutor-principle-2-title">Manos ocupadas</strong><p id="txt-tutor-principle-2-copy">Un fidget en la mano no dominante ayuda a canalizar energía durante la escritura.</p></div>
+            <div class="guide-card"><span>03</span><strong id="txt-tutor-principle-3-title">Confianza progresiva</strong><p id="txt-tutor-principle-3-copy">Avanza por dificultad lógica: 1, 2, 5, 10; luego 3, 4, 6, 11; finalmente 7, 8, 9, 12.</p></div>
+          </section>
+
+          <section class="guide-section">
+            <h3 id="txt-tutor-sequence-title">Secuencia Triple Method</h3>
+            <div class="guide-card"><span>A</span><strong id="txt-tutor-step-1-title">Grid</strong><p id="txt-tutor-step-1-copy">Completar el grid imprimible mientras se dice cada operación en voz alta.</p></div>
+            <div class="guide-card"><span>B</span><strong id="txt-tutor-step-2-title">Lanzamiento</strong><p id="txt-tutor-step-2-copy">Responder de memoria mientras se lanza y recibe un objeto suave.</p></div>
+            <div class="guide-card"><span>C</span><strong id="txt-tutor-step-3-title">MatPro App</strong><p id="txt-tutor-step-3-copy">Practicar las tablas del día con distractores inteligentes y revisión de fallos.</p></div>
+          </section>
+
+          <section class="guide-section guide-wide">
+            <h3 id="txt-tutor-play-title">Cómo se juega</h3>
+            <div class="guide-card"><span>1</span><strong id="txt-tutor-play-1-title">Practica las tablas</strong><p id="txt-tutor-play-1-copy">El tutor o jugador elige tablas, dificultad, número de preguntas y tiempo. Si el temporizador está en 0, la ronda no tiene límite de tiempo.</p></div>
+            <div class="guide-card"><span>2</span><strong id="txt-tutor-play-2-title">Maxitablas Pro</strong><p id="txt-tutor-play-2-copy">Ronda completa de 144 preguntas con todas las multiplicaciones desde 1×1 hasta 12×12.</p></div>
+            <div class="guide-card"><span>3</span><strong id="txt-tutor-play-3-title">Revisión de fallos</strong><p id="txt-tutor-play-3-copy">Al terminar, revisa solo errores y omitidas para enfocar la siguiente sesión.</p></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section id="about-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="txt-about-title">
+      <div class="modal-card about-card">
+        <div class="modal-head">
+          <div>
+            <span id="txt-about-eyebrow" class="eyebrow">Acerca de este proyecto</span>
+            <h2 id="txt-about-title">MatPro nació para ayudar a aprender con confianza.</h2>
+          </div>
+          <button id="txt-about-close" class="modal-close" type="button" aria-label="Cerrar">Cerrar</button>
+        </div>
+        <div class="about-copy">
+          <p id="txt-about-copy-1">MatPro es un sistema de aprendizaje humano, ADHD-friendly, creado para ayudar a niños a memorizar las tablas de multiplicar con estructura, movimiento y práctica digital.</p>
+          <p id="txt-about-copy-2">El proyecto nació del deseo de un padre de ayudar a su hijo Momo a superar la frustración con matemáticas, combinando apoyo familiar, principios de terapia ocupacional y desarrollo iterativo.</p>
+          <p id="txt-about-copy-3">MatPro es la base previa a DivisionPro, donde esas habilidades se aplican a la división larga.</p>
+          <strong id="txt-about-dedication">Developed with ❤️ for my son and students everywhere.</strong>
+        </div>
+      </div>
+    </section>
+
     <footer class="app-footer" aria-label="Enlaces del proyecto">
-      <a id="txt-footer-github" href="https://github.com/ivveshermosilla" target="_blank" rel="noopener">GitHub de Ivves</a>
+      <a id="txt-footer-github" href="https://github.com/ivveshermosilla/matpro-triple-method/tree/main" target="_blank" rel="noopener">Repositorio GitHub</a>
       <span id="txt-footer-division">DivisionPro pronto</span>
+      <button id="txt-footer-about" type="button">Acerca de este proyecto</button>
     </footer>
   </main>
 
@@ -268,7 +309,6 @@
   <script src="assets/js/state.js"></script>
   <script src="assets/js/navigation.js"></script>
   <script src="assets/js/config.js"></script>
-  <script src="assets/js/quick-practice.js"></script>
   <script src="assets/js/game.js"></script>
   <script src="assets/js/ranking.js"></script>
   <script src="assets/js/events.js"></script>

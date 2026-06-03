@@ -1,4 +1,4 @@
-// MatPro v1.6.0 - events
+// MatPro v1.6.1 - events
 function initEventHandlers() {
   $("lang-en-btn").addEventListener("click", () => setLanguage("en"));
   $("lang-es-btn").addEventListener("click", () => setLanguage("es"));
@@ -7,11 +7,10 @@ function initEventHandlers() {
 
   $("txt-btn-practice").addEventListener("click", showConfig);
   $("txt-btn-maxi").addEventListener("click", startMaxi);
-  $("txt-quick-check").addEventListener("click", checkQuickPractice);
-  $("txt-quick-next").addEventListener("click", nextQuickPractice);
-  $("quick-answer-input").addEventListener("keydown", (event) => {
-    if (event.key === "Enter") checkQuickPractice();
-  });
+  $("txt-btn-tutor-guide").addEventListener("click", () => openModal("tutor-guide-modal"));
+  $("txt-tutor-close").addEventListener("click", () => closeModal("tutor-guide-modal"));
+  $("txt-footer-about").addEventListener("click", () => openModal("about-modal"));
+  $("txt-about-close").addEventListener("click", () => closeModal("about-modal"));
   $("txt-reset-ranking").addEventListener("click", resetRanking);
 
   $$("[data-preset]").forEach(button => {
@@ -48,5 +47,15 @@ function initEventHandlers() {
     const button = event.target.closest("[data-rank-index]");
     if (!button) return;
     showHist(parseInt(button.dataset.rankIndex, 10));
+  });
+
+  $$(".modal-overlay").forEach(modal => {
+    modal.addEventListener("click", event => {
+      if (event.target === modal) closeModal(modal.id);
+    });
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") closeAllModals();
   });
 }

@@ -1,4 +1,4 @@
-// MatPro v1.6.0 - game
+// MatPro v1.6.1 - game
 function initGame() {
   if (config.tables.length === 0) {
     updateStartState();
@@ -22,22 +22,9 @@ function buildQuestionPool() {
   config.tables.forEach(a => {
     for (let b = 1; b <= 12; b++) combinations.push({ a, b });
   });
-  const questions = [];
-  let guard = 0;
-  while (questions.length < config.q && guard < config.q * 40) {
-    guard++;
-    const batch = [...combinations].sort(() => Math.random() - 0.5);
-    for (const q of batch) {
-      if (questions.length >= config.q) break;
-      const last = questions[questions.length - 1];
-      if (last && combinations.length > 1 && last.a === q.a && last.b === q.b) continue;
-      questions.push(q);
-    }
-  }
-  while (questions.length < config.q && combinations.length) {
-    questions.push(combinations[Math.floor(Math.random() * combinations.length)]);
-  }
-  return questions;
+  return combinations
+    .sort(() => Math.random() - 0.5)
+    .slice(0, Math.min(config.q, combinations.length));
 }
 
 function generateSmartOptions(a, b) {
@@ -85,7 +72,9 @@ function resetBar(duration, startPct) {
   bar.style.transition = "none";
   bar.style.width = `${startPct}%`;
   void bar.offsetWidth;
-  if (!isPaused) {
+  if (duration === 0) {
+    bar.style.width = "100%";
+  } else if (!isPaused) {
     bar.style.transition = `width ${duration}s linear`;
     bar.style.width = "0%";
   }
@@ -93,7 +82,8 @@ function resetBar(duration, startPct) {
 
 function startTimer() {
   clearInterval(timer);
-  setText("timer-value", `${timeLeft}s`);
+  setText("timer-value", formatTimeLabel(timeLeft));
+  if (config.t === 0) return;
   timer = setInterval(() => {
     if (isPaused) return;
     timeLeft--;
@@ -163,7 +153,7 @@ function abortCancel() {
   isPaused = false;
   clearInterval(cancelInterval);
   $("cancel-confirm").classList.add("hidden");
-  resetBar(Math.max(timeLeft, 1), parseFloat($("timer-bar").dataset.pausePct || "0"));
+  resetBar(config.t === 0 ? 0 : Math.max(timeLeft, 1), parseFloat($("timer-bar").dataset.pausePct || "0"));
   startTimer();
 }
 

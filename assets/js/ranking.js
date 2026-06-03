@@ -1,4 +1,4 @@
-// MatPro v1.6.0 - ranking
+// MatPro v1.6.1 - ranking
 function saveResult() {
   const t = i18n[curLang];
   const name = $("player-name-input").value.trim() || t.anonymous;

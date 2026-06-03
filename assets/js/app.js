@@ -1,7 +1,7 @@
-// MatPro v1.6.0 - app
+// MatPro v1.6.1 - app
 initEventHandlers();
+loadSavedConfig();
 initTablesGrid();
-nextQuickPractice();
 updateTexts();
-updatePresetButtons();
+updatePresetButtons(getPresetFromDiff(config.diffName));
 updateModeLabels();
