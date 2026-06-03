@@ -1,369 +1,278 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MatPro 👑 - Versión 1.5.0</title>
-    <style>
-        :root { --azul: #2980b9; --naranja: #e67e22; --rojo: #e74c3c; --verde: #27ae60; --gris: #7f8c8d; --fondo: #2c3e50; --purpura: #8e44ad; --dorado: #f1c40f; }
-        body { font-family: system-ui, -apple-system, sans-serif; background-color: var(--fondo); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: white; overflow: hidden; }
-        #quiz-container { background-color: #ecf0f1; padding: 25px; border-radius: 25px; width: 95%; max-width: 550px; max-height: 95vh; text-align: center; color: #2c3e50; box-shadow: 0 20px 40px rgba(0,0,0,0.5); position: relative; overflow-y: auto; display: flex; flex-direction: column; }
-        
-        /* Botón de Idioma Esquina Superior */
-        #lang-toggle-btn { position: absolute; top: 15px; right: 15px; background: white; border: 2px solid var(--azul); border-radius: 10px; padding: 5px 10px; font-weight: bold; font-size: 11px; z-index: 2000; cursor: pointer; color: var(--azul); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        
-        .hidden { display: none !important; }
-        button { transition: all 0.2s ease; cursor: pointer; border: none; }
-        button:hover { filter: brightness(1.1); transform: translateY(-2px); }
-        .mode-btn { display: block; width: 100%; padding: 18px; margin: 10px 0; border-radius: 20px; font-size: 20px; font-weight: 900; box-shadow: 0 4px 0 rgba(0,0,0,0.1); }
-        .btn-pro { background: var(--azul); color: white; }
-        .btn-maxi { background: #2d3436; border: 3px solid var(--dorado); color: var(--dorado); }
-        .config-section { text-align: left; background: white; padding: 12px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #ddd; }
-        .config-label { font-weight: bold; font-size: 13px; color: var(--azul); display: block; margin-bottom: 5px; }
-        .val-badge { background: var(--azul); color: white; padding: 4px 10px; border-radius: 8px; font-weight: bold; float: right; }
-        .tables-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
-        .table-chip { background: #eee; border: 2px solid #ddd; padding: 8px 0; border-radius: 8px; font-weight: bold; font-size: 13px; text-align: center; }
-        .table-chip.active { background: var(--verde); color: white; border-color: #1e8449; }
-        .records-table { width: 100%; border-collapse: collapse; font-size: 10px; background: white; border-radius: 10px; overflow: hidden; }
-        .records-table th { background: #34495e; color: white; padding: 8px; font-size: 9px; }
-        .records-table td { padding: 8px 4px; border-bottom: 1px solid #eee; color: #333; text-align: center; }
-        .badge-mode { padding: 2px 4px; border-radius: 4px; font-size: 8px; font-weight: bold; color: white; display: inline-block; }
-        .scroll-subwindow { background: #f8f9fa; border: 2px solid #bdc3c7; border-radius: 15px; max-height: 140px; overflow-y: auto; margin: 10px 0; padding: 10px; text-align: left; }
-        .review-item { padding: 8px; border-bottom: 1px solid #eee; font-size: 12px; margin-bottom: 4px; border-radius: 6px; }
-        .rev-wrong { border-left: 5px solid var(--rojo); background: #fff5f5; }
-        .rev-skipped { border-left: 5px solid var(--gris); background: #f1f2f6; color: var(--gris); }
-        .btn-main { padding: 16px; font-size: 18px; background-color: var(--verde); color: white; border-radius: 15px; font-weight: bold; width: 100%; margin-top: 10px; }
-        .option-btn { width: 100%; padding: 15px; margin: 5px 0; font-size: 24px; font-weight: 900; background: var(--naranja); color: white; border-radius: 15px; box-shadow: 0 4px 0 #d35400; }
-        .res-card { background: white; padding: 15px; border-radius: 20px; border: 1px solid #ddd; margin-bottom: 10px; }
-        .res-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px dashed #eee; font-weight: bold; }
-        .cancel-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(44, 62, 80, 0.98); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 25px; padding: 20px; color: white; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MatPro - Triple Method</title>
+  <meta name="description" content="MatPro Triple Method: practica tablas de multiplicar con una experiencia moderna, bilingue y ADHD-friendly." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 <body>
-
-<div id="quiz-container">
-    <button id="lang-toggle-btn" class="hidden" onclick="toggleLang()">🌐 ES / EN</button>
-
-    <div id="init-lang-screen">
-        <h1 style="margin-bottom:20px;">MatPro 👑</h1>
-        <p style="font-weight:bold; color:var(--gris); margin-bottom:20px;">Selecciona tu idioma / Select Language</p>
-        <button class="mode-btn btn-pro" onclick="setInitialLang('es')">🇪🇸 Español</button>
-        <button class="mode-btn btn-pro" onclick="setInitialLang('en')" style="background:#34495e">🇺🇸 English</button>
-    </div>
-
-    <div id="mode-screen" class="hidden">
-        <h1 id="txt-title" style="margin:0 0 10px 0;">MatPro 👑</h1>
-        <button id="txt-btn-practice" class="mode-btn btn-pro" onclick="showConfig()">Practica las tablas 👑</button>
-        <button id="txt-btn-maxi" class="mode-btn btn-maxi" onclick="startMaxi()">Maxitablas Pro ⭐</button>
-        <div style="margin-top: 15px;">
-            <div id="txt-ranking-title" style="background:#34495e; color:white; padding:8px; font-weight:bold; font-size:12px; border-radius:10px 10px 0 0;">🏆 TOP 10 RÁNKING</div>
-            <table class="records-table">
-                <thead><tr><th id="txt-th-player" style="text-align:left; padding-left:10px;">Jugador</th><th id="txt-th-mode">Modo</th><th id="txt-th-grade">Calif.</th><th id="txt-th-time">⏱️</th><th id="txt-th-stats">✅/❌/⚪</th></tr></thead>
-                <tbody id="ranking-body"></tbody>
-            </table>
-            <button id="txt-reset-ranking" onclick="resetRanking()" style="background:none; color:var(--rojo); font-size:10px; text-decoration:underline; border:none; margin-top:10px;">Resetear Scoreboard</button>
-            <div id="historical-review-area" class="hidden"><p id="txt-review-label" style="font-size:11px; margin:5px 0; font-weight:bold; color:var(--rojo);">Revisión:</p><div id="historical-scroll-window" class="scroll-subwindow"></div></div>
+  <main class="app">
+    <nav class="topbar" aria-label="Principal">
+      <div class="brand-lockup" aria-label="MatPro">
+        <div class="logo">M×</div>
+        <div class="brand-title">
+          <strong>MatPro</strong>
+          <span id="txt-nav-subtitle">MatPro · practica las tablas de multiplicar.</span>
         </div>
-    </div>
+      </div>
 
-    <div id="config-screen" class="hidden">
-        <h2 id="txt-config-title" style="margin:0 0 5px 0; color:var(--azul);">Configuración</h2>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-bottom: 15px;">
-            <button id="txt-diff-1" onclick="applyPreset('facil')" style="background:var(--verde); color:white; padding:8px; border-radius:8px; font-size:10px; font-weight:bold;">FÁCIL</button>
-            <button id="txt-diff-2" onclick="applyPreset('medio')" style="background:var(--azul); color:white; padding:8px; border-radius:8px; font-size:10px; font-weight:bold;">MEDIO</button>
-            <button id="txt-diff-3" onclick="applyPreset('dificil')" style="background:var(--naranja); color:white; padding:8px; border-radius:8px; font-size:10px; font-weight:bold;">DIFÍCIL</button>
-            <button id="txt-diff-4" onclick="applyPreset('experto')" style="background:var(--purpura); color:white; padding:8px; border-radius:8px; font-size:10px; font-weight:bold;">EXPERTO</button>
+      <div class="top-actions">
+        <div id="lang-toggle-btn" class="lang-switch" role="group" aria-label="Cambiar idioma">
+          <button id="lang-en-btn" type="button">EN</button>
+          <button id="lang-es-btn" type="button">ES</button>
         </div>
-        <div id="expert-alert" style="background:#fff3f3; color:var(--rojo); padding:10px; border-radius:12px; font-size:11px; font-weight:bold; margin-bottom:10px; border:1px solid var(--rojo); display:none;">⚠️ MODO EXPERTO: Se descuenta 1 respuesta correcta por cada 2 incorrectas.</div>
-        <div class="config-section"><label class="config-label"><span id="txt-label-q">Número de preguntas</span>: <span id="val-q" class="val-badge">20</span></label><input type="range" id="range-q" min="1" max="100" value="20" style="width:100%" oninput="updateVal('q', this.value)"></div>
-        <div class="config-section"><label class="config-label"><span id="txt-label-t">Tiempo por pregunta (segundos)</span>: <span id="val-t" class="val-badge">15</span></label><input type="range" id="range-t" min="1" max="30" value="15" style="width:100%" oninput="updateVal('t', this.value)"></div>
-        <div class="config-section"><label id="txt-label-tables" class="config-label">Tablas:</label><div class="tables-grid" id="tables-grid"></div></div>
-        <button id="txt-btn-start" class="btn-main" onclick="initGame()">¡COMENZAR!</button>
-        <button id="txt-btn-back" class="btn-main" style="background:var(--gris); padding:10px; font-size:14px;" onclick="location.reload()">ATRÁS</button>
-    </div>
+      </div>
+    </nav>
 
-    <div id="game-screen" class="hidden">
-        <div id="cancel-confirm" class="cancel-overlay hidden">
-            <h2 id="txt-quit-confirm">¿ABANDONAR PARTIDA?</h2>
-            <p><span id="txt-quit-timer">Saliendo en</span>: <span id="cancel-timer" style="font-size:40px; font-weight:bold; color:var(--dorado)">5</span>s</p>
-            <button id="txt-btn-keep" class="btn-main" style="background:var(--verde)" onclick="abortCancel()">SEGUIR JUGANDO</button>
-            <button id="txt-btn-confirm-quit" class="btn-main" style="background:var(--rojo); margin-top:15px; font-size:14px; padding:10px;" onclick="location.reload()">CONFIRMAR ABANDONO</button>
+    <section id="init-lang-screen" class="screen panel language-panel" aria-labelledby="txt-lang-title">
+      <span class="eyebrow" id="txt-lang-eyebrow">Antes de practicar</span>
+      <h1 id="txt-lang-title">MatPro</h1>
+      <p id="txt-lang-subtitle">Selecciona tu idioma para comenzar la sesión.</p>
+      <div class="language-actions">
+        <button id="txt-lang-es" class="btn btn-primary" type="button">Español</button>
+        <button id="txt-lang-en" class="btn btn-secondary" type="button">English</button>
+      </div>
+    </section>
+
+    <section id="mode-screen" class="screen home-grid hidden" aria-labelledby="txt-title">
+      <article class="panel hero-panel">
+        <div>
+          <span id="txt-home-eyebrow" class="eyebrow">Nuevo look, misma memoria rápida</span>
+          <h1 id="txt-title"><span class="gradient-text">Tablas</span> sin estrés.</h1>
+          <p id="txt-home-copy">Practica multiplicaciones con sesiones cortas, configuración clara, ranking visible y revisión de errores enfocada en aprender.</p>
+          <div class="hero-actions">
+            <button id="txt-btn-practice" class="btn btn-primary" type="button">Practica las tablas</button>
+            <button id="txt-btn-maxi" class="btn btn-secondary" type="button">Maxitablas Pro</button>
+          </div>
         </div>
-        <button id="txt-btn-quit" style="background:var(--rojo); color:white; padding:8px 15px; border-radius:10px; font-size:11px; font-weight:bold; margin-bottom:15px;" onclick="triggerCancel()">✖ ABANDONAR</button>
-        <div style="font-weight:bold; color:var(--gris); font-size:14px;"><span id="txt-game-q">Pregunta</span> <span id="current-num">1</span> / <span id="total-num">20</span></div>
-        <div style="width:100%; height:12px; background:#ddd; border-radius:6px; margin:10px 0; overflow:hidden;"><div id="timer-bar" style="width:100%; height:100%; background:var(--rojo); width: 100%;"></div></div>
-        <div id="question" style="font-size:75px; font-weight:900; color:var(--azul); margin:15px 0;">? × ?</div>
-        <div id="options-container"></div>
-    </div>
 
-    <div id="result-screen" class="hidden">
-        <h2 id="txt-res-title">¡Hecho! 🏁</h2>
-        <div class="res-card">
-            <div class="res-row"><span id="txt-res-time">Tiempo Total:</span><span id="res-time" style="color:var(--purpura)">0s</span></div>
-            <div class="res-row" style="padding:10px 0; border-bottom:2px solid #eee;">
-                <span id="txt-res-grade">Calificación:</span>
-                <div style="text-align:right">
-                    <div style="color:var(--azul); font-size:28px; font-weight:900;"><span id="txt-res-note">Nota</span> <span id="grade-cl">1.0</span></div>
-                    <div style="color:var(--gris); font-size:14px;">USA Grade: <span id="grade-usa">F</span></div>
-                </div>
+        <div>
+          <div class="mini-stats" aria-label="Resumen">
+            <div class="mini-stat"><strong id="stat-q">20</strong><span id="txt-stat-questions-label">preguntas</span></div>
+            <div class="mini-stat"><strong id="stat-t">15s</strong><span id="txt-stat-time-label">por pregunta</span></div>
+            <div class="mini-stat"><strong>12×12</strong><span id="txt-stat-method-label">Triple Method</span></div>
+          </div>
+          <div class="method-note">
+            <strong id="txt-method-title">Práctica activa</strong>
+            <span id="txt-method-copy">Respuesta escrita sin temporizador para reforzar recuerdo real antes de entrar al juego inteligente.</span>
+          </div>
+        </div>
+      </article>
+
+      <div class="home-side">
+        <aside class="panel active-practice-panel" aria-labelledby="txt-quick-title">
+          <div class="active-practice-head">
+            <div>
+              <h2 id="txt-quick-title">Práctica activa</h2>
+              <p id="txt-quick-subtitle">Multiplicación aleatoria cada vez que cargas la página.</p>
             </div>
-            <div class="res-row" style="color:var(--verde); font-size:12px;"><span id="txt-res-correct">Correctas:</span><span>✅ <span id="res-correct">0</span></span></div>
-            <div class="res-row" style="color:var(--rojo); font-size:12px;"><span id="txt-res-wrong">Incorrectas:</span><span>❌ <span id="res-wrong">0</span></span></div>
-            <div class="res-row" style="color:var(--gris); font-size:12px;"><span id="txt-res-skipped">Omitidas:</span><span>⚪ <span id="res-skipped">0</span></span></div>
+            <span id="txt-quick-chip" class="pill">Aleatoria</span>
+          </div>
+
+          <div class="quick-practice-card">
+            <div id="txt-quick-label" class="section-label">Multiplicación rápida</div>
+            <div id="quick-question" class="quick-practice-problem">7 × 8</div>
+            <div class="quick-practice-dock">
+              <input id="quick-answer-input" inputmode="numeric" pattern="[0-9]*" autocomplete="off" placeholder="Tu respuesta" />
+              <button id="txt-quick-check" class="btn btn-primary" type="button">OK</button>
+            </div>
+            <div id="quick-feedback" class="quick-feedback" aria-live="polite"></div>
+            <button id="txt-quick-next" class="btn btn-secondary" type="button">Otra multiplicación</button>
+          </div>
+        </aside>
+
+        <aside class="panel ranking-panel" aria-labelledby="txt-ranking-title">
+          <div class="card-header">
+            <div>
+              <h2 id="txt-ranking-title">Top 10 ranking</h2>
+              <p id="txt-ranking-hint">Toca un registro para revisar errores anteriores.</p>
+            </div>
+            <span id="txt-ranking-pill" class="pill">Scoreboard</span>
+          </div>
+          <div id="ranking-body" class="ranking-list"></div>
+          <div class="ranking-list ranking-actions">
+            <button id="txt-reset-ranking" class="btn btn-secondary" type="button">Resetear Scoreboard</button>
+            <div id="historical-review-area" class="hidden">
+              <div id="txt-review-label" class="section-label">Revisión</div>
+              <div id="historical-scroll-window" class="scroll-subwindow"></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="config-screen" class="screen config-layout hidden" aria-labelledby="txt-config-title">
+      <article class="panel">
+        <div class="card-header">
+          <div>
+            <h2 id="txt-config-title">Configuración</h2>
+            <p id="txt-config-copy">Elige dificultad, tiempo por pregunta y tablas activas.</p>
+          </div>
+          <span id="txt-config-pill" class="pill">Ajustes</span>
         </div>
-        <p id="txt-res-review" style="font-size:11px; text-align:left; margin:0; font-weight:bold;">Revisión de fallos:</p>
-        <div id="result-scroll-window" class="scroll-subwindow"></div>
-        <input type="text" id="player-name-input" placeholder="Tu nombre..." maxlength="15" style="width:85%; padding:15px; border-radius:12px; border:2px solid #ddd; text-align:center; font-size:18px; margin-top:10px;">
-        <button id="txt-btn-save" class="btn-main" onclick="saveResult()">GUARDAR RÉCORD</button>
-        <button id="txt-btn-exit" class="btn-main" style="background:var(--gris)" onclick="location.reload()">SALIR</button>
-    </div>
-</div>
 
-<script>
-    const i18n = {
-        es: {
-            title: "MatPro 👑", practice: "Practica las tablas 👑", maxi: "Maxitablas Pro ⭐", ranking: "🏆 TOP 10 RÁNKING",
-            thP: "Jugador", thM: "Modo", thG: "Calif.", thT: "⏱️", thS: "✅/❌/⚪", reset: "Resetear Scoreboard",
-            rev: "Revisión:", config: "Configuración", easy: "FÁCIL", med: "MEDIO", hard: "DIFÍCIL", exp: "EXPERTO",
-            expAlert: "⚠️ MODO EXPERTO: Se descuenta 1 respuesta correcta por cada 2 incorrectas.",
-            lQ: "Número de preguntas", lT: "Tiempo por pregunta (segundos)", lTabs: "Tablas:",
-            start: "¡COMENZAR!", back: "ATRÁS", qConf: "¿ABANDONAR PARTIDA?", qTimer: "Saliendo en",
-            keep: "SEGUIR JUGANDO", confQ: "CONFIRMAR ABANDONO", quit: "✖ ABANDONAR", gameQ: "Pregunta",
-            resT: "¡Hecho! 🏁", resTime: "Tiempo Total:", resGrad: "Calificación:", resNote: "Nota",
-            resC: "Correctas:", resW: "Incorrectas:", resS: "Omitidas:", resRev: "Revisión de fallos:",
-            namePh: "Tu nombre...", save: "GUARDAR RÉCORD", exit: "SALIR",
-            omit: "Omitida", your: "Tu respuesta:", perf: "¡Perfecto! Sin errores.", noE: "¡Sin errores!",
-            diffs: { Fácil: "Fácil", Medio: "Medio", Difícil: "Difícil", Experto: "Experto", Manual: "Manual", Maxi: "Maxi" }
-        },
-        en: {
-            title: "Tables Pro 👑", practice: "Practice Tables 👑", maxi: "Maxitables Pro ⭐", ranking: "🏆 TOP 10 RANKING",
-            thP: "Player", thM: "Mode", thG: "Grade", thT: "⏱️", thS: "✅/❌/⚪", reset: "Reset Scoreboard",
-            rev: "Review:", config: "Settings", easy: "EASY", med: "MEDIUM", hard: "HARD", exp: "EXPERT",
-            expAlert: "⚠️ EXPERT MODE: 1 correct answer is deducted for every 2 incorrect ones.",
-            lQ: "Number of questions", lT: "Time per question (seconds)", lTabs: "Tables:",
-            start: "START!", back: "BACK", qConf: "QUIT GAME?", qTimer: "Exiting in",
-            keep: "KEEP PLAYING", confQ: "CONFIRM QUIT", quit: "✖ QUIT", gameQ: "Question",
-            resT: "Done! 🏁", resTime: "Total Time:", resGrad: "Final Grade:", resNote: "Score",
-            resC: "Correct:", resW: "Wrong:", resS: "Omitted:", resRev: "Error Review:",
-            namePh: "Your name...", save: "SAVE RECORD", exit: "EXIT",
-            omit: "Omitted", your: "Your answer:", perf: "Perfect! No errors.", noE: "No errors!",
-            diffs: { Fácil: "Easy", Medio: "Medium", Difícil: "Hard", Experto: "Expert", Manual: "Manual", Maxi: "Maxi" }
-        }
-    };
+        <div class="config-grid">
+          <div>
+            <div id="txt-label-difficulty" class="section-label">Dificultad</div>
+            <div class="segmented" role="group" aria-label="Dificultad">
+              <button id="txt-diff-1" class="segment" data-preset="facil" type="button">Fácil</button>
+              <button id="txt-diff-2" class="segment" data-preset="medio" type="button">Medio</button>
+              <button id="txt-diff-3" class="segment" data-preset="dificil" type="button">Difícil</button>
+              <button id="txt-diff-4" class="segment" data-preset="experto" type="button">Experto</button>
+            </div>
+          </div>
 
-    let curLang = 'es';
-    const DB_KEY = 'tablas_pro_universal_records';
-    let config = { q: 20, t: 15, tables: [1,2,3,4,5,6,7,8,9,10,11,12], penalty: false, diffName: 'Manual' };
-    let pool = [], currentIdx = 0, score = { c:0, w:0, s:0 }, history = [], timer, timeLeft = 0, currentMode = '👑';
-    let cancelInterval, isPaused = false, startTime, totalTimeSeconds = 0;
+          <div>
+            <div id="txt-label-answer-mode" class="section-label">Tipo de práctica</div>
+            <div class="smart-practice-note">
+              <strong id="txt-smart-practice-title">Práctica inteligente</strong>
+              <span id="txt-smart-practice-copy">El temporizador usa selección rápida entre 4 opciones con distractores diseñados para desafiar la memoria.</span>
+            </div>
+          </div>
 
-    function setInitialLang(l) {
-        curLang = l;
-        document.getElementById('init-lang-screen').classList.add('hidden');
-        document.getElementById('mode-screen').classList.remove('hidden');
-        document.getElementById('lang-toggle-btn').classList.remove('hidden');
-        updateTexts();
-        renderRanking();
-    }
+          <div id="expert-alert" class="expert-note hidden">
+            <strong>!</strong>
+            <span id="txt-expert-alert">Modo experto: se descuenta 1 respuesta correcta por cada 2 incorrectas.</span>
+          </div>
 
-    function toggleLang() {
-        curLang = (curLang === 'es') ? 'en' : 'es';
-        updateTexts();
-        renderRanking();
-    }
+          <div class="sliders">
+            <div class="field">
+              <label for="range-q"><span id="txt-label-q">Número de preguntas</span><strong id="val-q">20</strong></label>
+              <input type="range" id="range-q" min="1" max="100" value="20" />
+            </div>
+            <div class="field">
+              <label for="range-t"><span id="txt-label-t">Tiempo por pregunta</span><strong><span id="val-t">15</span>s</strong></label>
+              <input type="range" id="range-t" min="1" max="30" value="15" />
+            </div>
+          </div>
 
-    function updateTexts() {
-        const t = i18n[curLang];
-        document.getElementById('txt-title').innerText = t.title;
-        document.getElementById('txt-btn-practice').innerText = t.practice;
-        document.getElementById('txt-btn-maxi').innerText = t.maxi;
-        document.getElementById('txt-ranking-title').innerText = t.ranking;
-        document.getElementById('txt-th-player').innerText = t.thP;
-        document.getElementById('txt-th-mode').innerText = t.thM;
-        document.getElementById('txt-th-grade').innerText = t.thG;
-        document.getElementById('txt-th-time').innerText = t.thT;
-        document.getElementById('txt-th-stats').innerText = t.thS;
-        document.getElementById('txt-reset-ranking').innerText = t.reset;
-        document.getElementById('txt-review-label').innerText = t.rev;
-        document.getElementById('txt-config-title').innerText = t.config;
-        document.getElementById('txt-diff-1').innerText = t.easy;
-        document.getElementById('txt-diff-2').innerText = t.med;
-        document.getElementById('txt-diff-3').innerText = t.hard;
-        document.getElementById('txt-diff-4').innerText = t.exp;
-        document.getElementById('expert-alert').innerText = t.expAlert;
-        document.getElementById('txt-label-q').innerText = t.lQ;
-        document.getElementById('txt-label-t').innerText = t.lT;
-        document.getElementById('txt-label-tables').innerText = t.lTabs;
-        document.getElementById('txt-btn-start').innerText = t.start;
-        document.getElementById('txt-btn-back').innerText = t.back;
-        document.getElementById('txt-quit-confirm').innerText = t.qConf;
-        document.getElementById('txt-quit-timer').innerText = t.qTimer;
-        document.getElementById('txt-btn-keep').innerText = t.keep;
-        document.getElementById('txt-btn-confirm-quit').innerText = t.confQ;
-        document.getElementById('txt-btn-quit').innerText = t.quit;
-        document.getElementById('txt-game-q').innerText = t.gameQ;
-        document.getElementById('txt-res-title').innerText = t.resT;
-        document.getElementById('txt-res-time').innerText = t.resTime;
-        document.getElementById('txt-res-grade').innerText = t.resGrad;
-        document.getElementById('txt-res-note').innerText = t.resNote;
-        document.getElementById('txt-res-correct').innerText = t.resC;
-        document.getElementById('txt-res-wrong').innerText = t.resW;
-        document.getElementById('txt-res-skipped').innerText = t.resS;
-        document.getElementById('txt-res-review').innerText = t.resRev;
-        document.getElementById('player-name-input').placeholder = t.namePh;
-        document.getElementById('txt-btn-save').innerText = t.save;
-        document.getElementById('txt-btn-exit').innerText = t.exit;
-    }
+          <div>
+            <div id="txt-label-tables" class="section-label">Tablas</div>
+            <div class="table-actions">
+              <button id="txt-select-all-tables" class="btn btn-secondary" type="button">Seleccionar todas</button>
+              <button id="txt-clear-tables" class="btn btn-muted" type="button">Deseleccionar todas</button>
+            </div>
+            <div id="tables-grid" class="tables-grid" aria-label="Seleccionar tablas"></div>
+            <div id="tables-warning" class="empty-state table-warning hidden">Selecciona al menos una tabla para comenzar.</div>
+          </div>
 
-    const grid = document.getElementById('tables-grid');
-    for(let i=1; i<=12; i++) {
-        const d = document.createElement('div'); d.className = 'table-chip active'; d.innerText = i;
-        d.onclick = () => {
-            config.diffName = 'Manual';
-            if(config.tables.includes(i)) { if(config.tables.length > 1) { config.tables = config.tables.filter(x => x !== i); d.classList.remove('active'); } }
-            else { config.tables.push(i); d.classList.add('active'); }
-        }; grid.appendChild(d);
-    }
+          <div class="hero-actions">
+            <button id="txt-btn-start" class="btn btn-primary" type="button">Comenzar</button>
+            <button id="txt-btn-back" class="btn btn-muted" type="button">Atrás</button>
+          </div>
+        </div>
+      </article>
 
-    function updateVal(type, val) { 
-        config[type] = parseInt(val); 
-        document.getElementById(`val-${type}`).innerText = val; 
-        document.getElementById(`range-${type}`).value = val;
-    }
+      <aside class="panel preview-card">
+        <div class="section-label" id="txt-preview-label">Vista previa</div>
+        <div class="preview-phone">
+          <div class="preview-screen">
+            <div class="rank-name">
+              <strong id="txt-preview-title">Práctica inteligente</strong>
+              <span id="txt-preview-subtitle">Pregunta 1 / 20</span>
+            </div>
+            <div class="preview-problem">7 × 8</div>
+            <div class="preview-options" aria-hidden="true">
+              <span>49</span>
+              <span class="active">56</span>
+              <span>63</span>
+              <span>64</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </section>
 
-    function applyPreset(p) {
-        config.penalty = false; document.getElementById('expert-alert').style.display = 'none';
-        if(p === 'facil') { updateVal('q', 20); updateVal('t', 15); config.diffName = 'Fácil'; }
-        else if(p === 'medio') { updateVal('q', 20); updateVal('t', 12); config.diffName = 'Medio'; }
-        else if(p === 'dificil') { updateVal('q', 20); updateVal('t', 10); config.diffName = 'Difícil'; }
-        else if(p === 'experto') { updateVal('q', 20); updateVal('t', 7); config.penalty = true; config.diffName = 'Experto'; document.getElementById('expert-alert').style.display = 'block'; }
-    }
+    <section id="game-screen" class="screen hidden" aria-labelledby="question">
+      <article class="panel game-panel">
+        <div id="cancel-confirm" class="cancel-overlay hidden">
+          <div class="cancel-card">
+            <h2 id="txt-quit-confirm">¿Abandonar partida?</h2>
+            <p><span id="txt-quit-timer">Saliendo en</span>: <span id="cancel-timer">5</span>s</p>
+            <div class="result-actions">
+              <button id="txt-btn-keep" class="btn btn-primary" type="button">Seguir jugando</button>
+              <button id="txt-btn-confirm-quit" class="btn btn-danger" type="button">Confirmar abandono</button>
+            </div>
+          </div>
+        </div>
 
-    function showConfig() { currentMode = '👑'; document.getElementById('mode-screen').classList.add('hidden'); document.getElementById('config-screen').classList.remove('hidden'); }
-    function startMaxi() { currentMode = '⭐'; config = { q: 144, t: 10, tables: [1,2,3,4,5,6,7,8,9,10,11,12], penalty: false, diffName: 'Maxi' }; initGame(); }
+        <div class="game-top">
+          <button id="txt-btn-quit" class="btn btn-danger" type="button">Abandonar</button>
+          <div class="game-meta">
+            <strong><span id="txt-game-q">Pregunta</span> <span id="current-num">1</span> / <span id="total-num">20</span></strong>
+            <span id="txt-game-mode">Práctica activa</span>
+          </div>
+          <div id="live-score-chip" class="pill">0 / 0 / 0</div>
+        </div>
 
-    function initGame() {
-        document.getElementById('lang-toggle-btn').classList.add('hidden');
-        pool = []; let combs = []; config.tables.forEach(a => { for(let b=1; b<=12; b++) combs.push({a, b}); });
-        while(pool.length < config.q) { let batch = [...combs].sort(() => Math.random() - 0.5); for(let q of batch) { if(pool.length >= config.q) break; pool.push(q); } }
-        currentIdx = 0; score = { c:0, w:0, s:0 }; history = []; isPaused = false; startTime = Date.now();
-        document.getElementById('total-num').innerText = pool.length;
-        document.getElementById('mode-screen').classList.add('hidden'); document.getElementById('config-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden'); showQ();
-    }
+        <div class="timer-track" aria-label="Tiempo restante">
+          <div id="timer-bar"></div>
+        </div>
 
-    function generateSmartOptions(a, b) {
-        const correct = a * b; let options = new Set([correct]);
-        const strategy = [()=>correct+a, ()=>correct-a, ()=>correct+b, ()=>correct+1, ()=>correct-1, ()=>parseInt(correct.toString().split('').reverse().join('')) || correct+5];
-        while(options.size < 4) {
-            let fake = (Math.random() > 0.3) ? strategy[Math.floor(Math.random()*strategy.length)]() : correct + (Math.floor(Math.random()*11)-5);
-            if(fake > 0 && fake !== correct) options.add(fake);
-        }
-        return Array.from(options).sort(() => Math.random() - 0.5);
-    }
+        <div class="question-card">
+          <div class="pill timer-pill"><span id="txt-timer-label">Tiempo</span>: <span id="timer-value">15s</span></div>
+          <div id="question">? × ?</div>
+          <div id="options-container" class="choice-grid"></div>
+        </div>
 
-    function showQ() {
-        if(currentIdx >= pool.length) return finish();
-        const q = pool[currentIdx];
-        document.getElementById('current-num').innerText = currentIdx + 1;
-        document.getElementById('question').innerText = `${q.a} × ${q.b}`;
-        const opts = generateSmartOptions(q.a, q.b);
-        document.getElementById('options-container').innerHTML = opts.map(o => `<button class="option-btn" onclick="handleSelect(${o})">${o}</button>`).join('');
-        timeLeft = config.t; resetBar(config.t, 100); startTimer();
-    }
+        <div id="live-review-strip" class="live-review" aria-label="Revisión rápida"></div>
+      </article>
+    </section>
 
-    function resetBar(duration, startPct) {
-        const bar = document.getElementById('timer-bar');
-        bar.style.transition = 'none'; bar.style.width = startPct + '%';
-        void bar.offsetWidth; 
-        if(!isPaused) { bar.style.transition = `width ${duration}s linear`; bar.style.width = '0%'; }
-    }
+    <section id="result-screen" class="screen hidden" aria-labelledby="txt-res-title">
+      <article class="panel">
+        <div class="result-grid">
+          <div class="score-panel">
+            <div class="grade-ring" id="grade-ring"><span id="grade-cl">1.0</span></div>
+            <p class="result-note"><span id="txt-res-ring-label">Nota final</span> · USA Grade <span id="grade-usa">F</span></p>
+          </div>
 
-    function startTimer() { clearInterval(timer); timer = setInterval(() => { if(!isPaused) { timeLeft--; if(timeLeft <= 0) handleSelect(null); } }, 1000); }
+          <div class="config-grid">
+            <div>
+              <h2 id="txt-res-title" class="result-title">¡Hecho!</h2>
+              <p id="txt-res-save-hint" class="result-note">Revisa tus resultados y guarda el récord si quieres conservarlo en este dispositivo.</p>
+            </div>
 
-    function handleSelect(val) {
-        if(isPaused) return; clearInterval(timer);
-        const q = pool[currentIdx]; const ans = q.a * q.b;
-        let status = (val === ans) ? "correct" : (val === null ? "skipped" : "wrong");
-        if(status === "correct") score.c++; else if(status === "skipped") score.s++; else score.w++;
-        history.push({ q: `${q.a}×${q.b}`, ans, user: val, status });
-        currentIdx++; showQ();
-    }
+            <div class="res-card">
+              <div class="res-row"><span id="txt-res-time">Tiempo total:</span><span id="res-time">0s</span></div>
+              <div class="res-row"><span id="txt-res-grade">Calificación:</span><strong><span id="txt-res-note">Nota</span> <span id="grade-cl-small">1.0</span> · <span id="grade-usa-small">F</span></strong></div>
+              <div class="res-row"><span id="txt-res-correct">Correctas:</span><span id="res-correct">0</span></div>
+              <div class="res-row"><span id="txt-res-wrong">Incorrectas:</span><span id="res-wrong">0</span></div>
+              <div class="res-row"><span id="txt-res-skipped">Omitidas:</span><span id="res-skipped">0</span></div>
+            </div>
 
-    function triggerCancel() {
-        isPaused = true; clearInterval(timer);
-        const bar = document.getElementById('timer-bar');
-        const computedWidth = window.getComputedStyle(bar).width;
-        const currentPct = (parseFloat(computedWidth) / bar.parentElement.offsetWidth) * 100;
-        bar.dataset.pausePct = currentPct;
-        bar.style.transition = 'none'; bar.style.width = computedWidth;
-        document.getElementById('cancel-confirm').classList.remove('hidden');
-        let count = 5; document.getElementById('cancel-timer').innerText = count;
-        cancelInterval = setInterval(() => { count--; document.getElementById('cancel-timer').innerText = count; if(count <= 0) location.reload(); }, 1000);
-    }
+            <div>
+              <div id="txt-res-review" class="section-label">Revisión de fallos</div>
+              <div id="result-scroll-window" class="scroll-subwindow"></div>
+            </div>
 
-    function abortCancel() {
-        isPaused = false; clearInterval(cancelInterval);
-        document.getElementById('cancel-confirm').classList.add('hidden');
-        resetBar(timeLeft, parseFloat(document.getElementById('timer-bar').dataset.pausePct));
-        startTimer();
-    }
+            <input type="text" id="player-name-input" maxlength="15" placeholder="Tu nombre" />
+            <div class="result-actions">
+              <button id="txt-btn-save" class="btn btn-primary" type="button">Guardar récord</button>
+              <button id="txt-btn-exit" class="btn btn-muted" type="button">Salir</button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
 
-    function finish() {
-        document.getElementById('lang-toggle-btn').classList.remove('hidden');
-        totalTimeSeconds = Math.floor((Date.now() - startTime) / 1000);
-        let effC = config.penalty ? Math.max(0, score.c - Math.floor(score.w / 2)) : score.c;
-        let ratio = effC / pool.length;
-        document.getElementById('res-time').innerText = totalTimeSeconds + "s";
-        document.getElementById('grade-cl').innerText = (ratio * 6 + 1).toFixed(1);
-        document.getElementById('grade-usa').innerText = (ratio >= 0.9 ? 'A' : ratio >= 0.8 ? 'B' : ratio >= 0.7 ? 'C' : ratio >= 0.6 ? 'D' : 'F');
-        document.getElementById('res-correct').innerText = score.c;
-        document.getElementById('res-wrong').innerText = score.w;
-        document.getElementById('res-skipped').innerText = score.s;
-        
-        const t = i18n[curLang];
-        const badOnes = history.filter(x => x.status !== 'correct');
-        document.getElementById('result-scroll-window').innerHTML = badOnes.length > 0 ? 
-            badOnes.map(x => `<div class="review-item rev-${x.status}"><b>${x.q} = ${x.ans}</b><br>${t.your} ${x.user===null?t.omit:x.user}</div>`).join('') :
-            `<div style="color:var(--verde); font-size:12px; padding:10px;">${t.perf}</div>`;
-        document.getElementById('game-screen').classList.add('hidden'); document.getElementById('result-screen').classList.remove('hidden');
-    }
+    <footer class="app-footer" aria-label="Enlaces del proyecto">
+      <a id="txt-footer-github" href="https://github.com/ivveshermosilla" target="_blank" rel="noopener">GitHub de Ivves</a>
+      <span id="txt-footer-division">DivisionPro pronto</span>
+    </footer>
+  </main>
 
-    function saveResult() {
-        const name = document.getElementById('player-name-input').value || "Anónimo";
-        const rec = { name, time: totalTimeSeconds, gradeCL: document.getElementById('grade-cl').innerText, gradeUSA: document.getElementById('grade-usa').innerText, stats: { c: score.c, w: score.w, s: score.s }, tables: config.tables.sort((a,b)=>a-b).join(','), mode: currentMode, diff: config.diffName, history };
-        let recs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
-        recs.push(rec); recs.sort((a,b) => b.gradeCL - a.gradeCL || a.time - b.time).splice(10);
-        localStorage.setItem(DB_KEY, JSON.stringify(recs)); location.reload();
-    }
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/state.js"></script>
+  <script src="assets/js/navigation.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/quick-practice.js"></script>
+  <script src="assets/js/game.js"></script>
+  <script src="assets/js/ranking.js"></script>
+  <script src="assets/js/events.js"></script>
+  <script src="assets/js/app.js"></script>
 
-    function renderRanking() {
-        const recs = JSON.parse(localStorage.getItem(DB_KEY) || '[]');
-        const t = i18n[curLang];
-        document.getElementById('ranking-body').innerHTML = recs.map((r, i) => `
-            <tr onclick="showHist(${i})">
-                <td style="text-align:left; padding-left:10px;"><b>${r.name}</b><br><span style="font-size:8px; color:var(--gris)">Tabs: ${r.tables}</span></td>
-                <td><span class="badge-mode" style="background:${r.mode==='👑'?'var(--azul)':'#2d3436'}">${r.mode} ${t.diffs[r.diff] || r.diff}</span></td>
-                <td><b>${r.gradeCL}</b><br><span class="usa-grade">(${r.gradeUSA})</span></td>
-                <td style="color:var(--purpura); font-weight:bold;">${r.time}s</td>
-                <td style="color:var(--gris)">${r.stats.c}/${r.stats.w}/${r.stats.s}</td>
-            </tr>`).join('');
-    }
-
-    function showHist(idx) {
-        const recs = JSON.parse(localStorage.getItem(DB_KEY) || '[]'); const data = recs[idx];
-        const t = i18n[curLang];
-        if(data && data.history) {
-            const badOnes = data.history.filter(x => x.status !== 'correct');
-            document.getElementById('historical-scroll-window').innerHTML = badOnes.length > 0 ? 
-                badOnes.map(x => `<div class="review-item rev-${x.status}"><b>${x.q} = ${x.ans}</b><br>${t.your} ${x.user===null?t.omit:x.user}</div>`).join('') :
-                `<div style="color:var(--verde); font-size:12px;">${t.noE}</div>`;
-            document.getElementById('historical-review-area').classList.remove('hidden');
-        }
-    }
-
-    function resetRanking() { if(confirm(curLang === 'es' ? "¿Borrar historial?" : "Reset Ranking?")) { localStorage.removeItem(DB_KEY); location.reload(); } }
-</script>
 </body>
-
 </html>
