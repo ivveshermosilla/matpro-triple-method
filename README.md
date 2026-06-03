@@ -17,7 +17,7 @@ The digital component of this project evolved across 51+ iterations into a robus
 * **🧠 Smart Distractors**: Dynamically generates logical incorrect options (e.g., adjacent table values or reversed digits) instead of random numbers to truly challenge memory.
 * **📊 Dual Grading System**: Performance evaluation tailored for both **USA (A-F)** and **Chile (1.0-7.0)** standards.
 * **🌎 Multilingual Support**: Full UI internationalization (i18n) to switch seamlessly between English and Spanish.
-* **📈 Historical Error Review**: Filters and exclusively displays mistakes and skipped questions for clean, focused learning reinforcement.
+* **📈 Local Session History**: Keeps the 10 most recent saved sessions on the current device, including game mode, practice settings, score, and focused error review.
 * **🧭 Tutor Guide + Printables**: Includes the Triple Method guidance and printable 12x12 grids for English and Spanish.
 * **⏱️ Optional Timer**: Practice rounds can be timed or untimed by setting the timer to 0.
 * **📱 Responsive Modern UI**: Built to remain usable on desktop, iPad/tablets, iPhone, and Android phones.

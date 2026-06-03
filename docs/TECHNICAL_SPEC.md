@@ -2,7 +2,7 @@
 
 ## Overview
 
-MatPro v1.6.1 is a vanilla HTML/CSS/JavaScript web app published through GitHub Pages. The app helps students practice multiplication tables with a bilingual ES/EN interface, configurable smart practice, tutor guidance, local ranking, and focused error review.
+MatPro v1.6.2 is a vanilla HTML/CSS/JavaScript web app published through GitHub Pages. The app helps students practice multiplication tables with a bilingual ES/EN interface, configurable smart practice, tutor guidance, local session history, and focused error review.
 
 Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 
@@ -24,7 +24,7 @@ Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 | `assets/js/navigation.js` | Screen switching, initial language selection, live language updates, and translated UI rendering. |
 | `assets/js/config.js` | Difficulty presets, sliders, table selector, select-all/deselect-all behavior, question limit validation, saved configuration, no-timer mode, and Maxitablas setup. |
 | `assets/js/game.js` | Smart practice: unique question pool, smart distractors, optional timer, scoring, pause/quit flow, final grades, and error review rendering. |
-| `assets/js/ranking.js` | Top 10 local scoreboard, saved-record sorting, historical review, and reset behavior. |
+| `assets/js/ranking.js` | Local history for the 10 most recent saved sessions, per-session configuration snapshots, historical review, and reset behavior. |
 | `assets/js/events.js` | Centralized DOM event wiring for clicks, sliders, table chips, answer options, ranking history, and modals. |
 | `assets/js/app.js` | Boot sequence. Initializes events, saved config, table chips, text rendering, presets, and mode labels. |
 | `assets/printables/matpro-grid-es.html` | Spanish printable source for the Triple Method blank 12x12 grid sheet. |
@@ -39,7 +39,7 @@ Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 ## Screens
 
 - `init-lang-screen`: first-use language choice with the same EN/ES switch style used across the site.
-- `mode-screen`: player-focused home dashboard with hero copy, practice buttons, ranking, GitHub link, DivisionPro placeholder, and about-project action.
+- `mode-screen`: player-focused home dashboard with hero copy, practice buttons, recent-session history, GitHub link, DivisionPro placeholder, and about-project action.
 - `config-screen`: practice configuration with difficulty presets, smart-practice explanation, question/time sliders, and table selection.
 - `game-screen`: smart practice with four option buttons, optional visual timer, live score, live review strip, and quit confirmation.
 - `result-screen`: final grade, USA letter grade, Chilean numeric grade, stats, error review, and save controls.
@@ -76,10 +76,14 @@ Scoreboard key: `tablas_pro_universal_records`
 
 Configuration key: `matpro_player_config_v1`
 
+The scoreboard stores the 10 most recent saved sessions, not a global ranking. Each saved session includes its game type, timestamp, score, selected practice settings, and complete answer history for later error review.
+
 Saved record shape:
 
 ```js
 {
+  id: "matpro-1760000000000",
+  createdAt: "2026-06-03T13:00:00.000Z",
   name: "Player",
   time: 42,
   gradeCL: "6.4",
@@ -87,8 +91,18 @@ Saved record shape:
   stats: { c: 18, w: 1, s: 1 },
   tables: "1,2,3,4,5",
   mode: "👑",
+  gameType: "practice",
   diff: "Manual",
   answerMode: "options",
+  config: {
+    tables: [1, 2, 3, 4, 5],
+    questions: 20,
+    requestedQuestions: 20,
+    timer: 0,
+    difficulty: "Manual",
+    penalty: false,
+    answerMode: "options"
+  },
   history: [
     { q: "7×8", ans: 56, user: 54, status: "wrong" }
   ]

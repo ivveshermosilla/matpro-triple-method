@@ -471,6 +471,15 @@ button:focus-visible, input:focus-visible {
   line-height: 1.4;
 }
 
+.rank-name .rank-meta {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.rank-name .rank-config {
+  margin-top: 3px;
+}
+
 .grade {
   display: grid;
   place-items: center;
@@ -481,6 +490,12 @@ button:focus-visible, input:focus-visible {
   color: white;
   background: var(--text);
   font-weight: 1000;
+}
+
+.grade small {
+  display: block;
+  font-size: .68rem;
+  opacity: .78;
 }
 
 .empty-state {
@@ -955,6 +970,21 @@ input[type="range"] {
   padding: 12px;
   margin-bottom: 8px;
   line-height: 1.45;
+}
+
+.history-summary {
+  border-left: 5px solid var(--brand);
+  background: white;
+}
+
+.history-summary span {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+}
+
+.history-review-title {
+  margin: 6px 0 8px;
 }
 
 .review-item:last-child { margin-bottom: 0; }
