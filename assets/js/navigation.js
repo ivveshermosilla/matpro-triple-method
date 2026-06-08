@@ -12,6 +12,7 @@ function setInitialLang(lang) {
 
 function setLanguage(lang) {
   curLang = lang;
+  localStorage.setItem('ivves_preferred_lang', lang);
   updateTexts();
   renderRanking();
   if (!$("historical-review-area").classList.contains("hidden")) {
@@ -145,6 +146,8 @@ function updateTexts() {
   updateModeLabels();
   updateStartState();
   renderQuickPracticeFeedback();
+  var _dpLink = $("txt-footer-division");
+  if (_dpLink) _dpLink.href = "https://ivveshermosilla.github.io/DivisionPro/?lang=" + curLang;
 }
 
 function updateLanguageSwitch() {
