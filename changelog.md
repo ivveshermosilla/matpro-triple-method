@@ -88,3 +88,11 @@ v1.6.1 (Tutor Guide and Printables): Moved the Triple Method methodology into a 
 v1.6.2 (Local Session History): Reworked the scoreboard into a local history of the 10 most recent saved sessions instead of a best-score ranking. Each record now stores the selected game type, timestamp, practice configuration, score, and full answer history, and tapping a session shows its settings plus errors with correct solutions.
 
 v1.6.3 (Active Practice Restoration Fix): Restored the Active Practice home card as a primary warmup beside the game selection, including random 1x1 through 12x12 multiplication, typed answer checking, bilingual feedback, and the scoreboard positioned below Active Practice.
+
+v1.6.3 post-release corrections:
+
+Live DivisionPro footer link: The footer "DivisionPro pronto" placeholder was replaced with a live anchor linking to the official DivisionPro GitHub Pages app. The ES label reads "Jugar DivisionPro" and the EN label reads "Play DivisionPro".
+
+Cross-app language bridge: The footer link appends the active language as a URL parameter (`?lang=es` or `?lang=en`) so DivisionPro opens in the same language the player is using in MatPro. On load, the app reads a `?lang=` URL parameter and falls back to the `ivves_preferred_lang` localStorage key (shared with DivisionPro). Language changes save to that same key so both apps stay in sync across sessions.
+
+ES dedication fix: Fixed the `aboutDedication` Spanish translation which was incorrectly showing the English string. The app now displays "Desarrollado con ❤️ para mi hijo y estudiantes en todo el mundo." when Spanish is active.

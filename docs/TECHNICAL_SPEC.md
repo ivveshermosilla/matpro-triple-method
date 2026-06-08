@@ -40,7 +40,7 @@ Official URL: <https://ivveshermosilla.github.io/matpro-triple-method/>
 ## Screens
 
 - `init-lang-screen`: first-use language choice with the same EN/ES switch style used across the site.
-- `mode-screen`: player-focused home dashboard with hero copy, practice buttons, active practice warmup, recent-session history, GitHub link, DivisionPro placeholder, and about-project action.
+- `mode-screen`: player-focused home dashboard with hero copy, practice buttons, active practice warmup, recent-session history, GitHub link, live DivisionPro cross-link (appends `?lang=` dynamically), and about-project action.
 - `config-screen`: practice configuration with difficulty presets, smart-practice explanation, question/time sliders, and table selection.
 - `game-screen`: smart practice with four option buttons, optional visual timer, live score, live review strip, and quit confirmation.
 - `result-screen`: final grade, USA letter grade, Chilean numeric grade, stats, error review, and save controls.
@@ -117,6 +117,16 @@ Saved record shape:
 - All visible copy lives in `assets/js/i18n.js`.
 - `updateTexts()` in `assets/js/navigation.js` applies translations to the DOM.
 - The language switch updates labels, placeholders, ranking messages, review messages, ARIA text, saved-record display labels, and the tutor grid download target.
+
+## Cross-App Language Bridge
+
+MatPro and DivisionPro share a language preference so players stay in the same language across both apps.
+
+- On load, `assets/js/app.js` reads the `?lang=es` or `?lang=en` URL parameter first. If present, it sets `curLang` and writes it to localStorage.
+- If no URL parameter is present, the app reads the `ivves_preferred_lang` localStorage key as a fallback.
+- Every time the player toggles the language, `assets/js/navigation.js` writes the new value to `ivves_preferred_lang`.
+- `updateTexts()` in `assets/js/navigation.js` rebuilds the footer DivisionPro link as `https://ivveshermosilla.github.io/DivisionPro/?lang=<curLang>` on every language update, so the cross-app link always carries the active language.
+- DivisionPro uses the same `ivves_preferred_lang` key and the same `?lang=` parameter convention, making the bridge bidirectional.
 
 ## Responsive And Accessibility Notes
 
