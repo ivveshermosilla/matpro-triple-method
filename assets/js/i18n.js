@@ -137,7 +137,7 @@ const i18n = {
     aboutCopy1: "MatPro es un sistema de aprendizaje humano, ADHD-friendly, creado para ayudar a niños a memorizar las tablas de multiplicar con estructura, movimiento y práctica digital.",
     aboutCopy2: "El proyecto nació del deseo de un padre de ayudar a su hijo Momo a superar la frustración con matemáticas, combinando apoyo familiar, principios de terapia ocupacional y desarrollo iterativo.",
     aboutCopy3: "MatPro es la base previa a DivisionPro, donde esas habilidades se aplican a la división larga.",
-    aboutDedication: "Developed with ❤️ for my son and students everywhere.",
+    aboutDedication: "Desarrollado con ❤️ para mi hijo y estudiantes en todo el mundo.",
     modes: { options: "Inteligente" },
     diffs: { "Fácil": "Fácil", "Medio": "Medio", "Difícil": "Difícil", "Experto": "Experto", "Manual": "Manual", "Maxi": "Maxi" }
   },
